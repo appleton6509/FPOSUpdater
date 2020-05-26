@@ -1,0 +1,50 @@
+﻿<Window x:Class="FPOSPriceUpdater.Main"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FPOSPriceUpdater"
+        mc:Ignorable="d"
+        Title="Main" Height="300" Width="465" MinHeight="300" MinWidth="465">
+    <Grid x:Name="Grid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="10*"/>
+        </Grid.ColumnDefinitions>
+        <Rectangle Style="{DynamicResource TileRectStyle}" Grid.Column="1"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+     
+            <Button x:Name="btnExportPrices" Grid.Row="0" Style="{DynamicResource btnBoxStyle}" Click="btnExportPrices_Click">
+                <TextBlock Text="Export Prices" TextWrapping="WrapWithOverflow"/>
+            </Button>
+            <Button x:Name="btnImportPrices" Grid.Row="1" Style="{DynamicResource btnBoxStyle}" Click="btnImportPrices_Click" >
+                <TextBlock Text="Import Prices" TextWrapping="WrapWithOverflow"/>
+            </Button>
+            <Button x:Name="btnSettings" Grid.Row="2" Style="{DynamicResource btnBoxStyle}" Click="btnSettings_Click">
+                <TextBlock Text="Settings" TextWrapping="WrapWithOverflow"/>
+            </Button>
+            <Button  Grid.Row="3" Style="{DynamicResource btnBoxStyle}" >
+                <TextBlock TextWrapping="WrapWithOverflow"/>
+            </Button>
+            <Button  Grid.Row="4" Style="{DynamicResource btnBoxStyle}" >
+                <TextBlock TextWrapping="WrapWithOverflow"/>
+            </Button>
+            <Button  Grid.Row="5" Style="{DynamicResource btnBoxStyle}">
+                <TextBlock Text="" TextWrapping="WrapWithOverflow"/>
+            </Button>
+        </Grid>
+        <Frame x:Name="MainFrame" Grid.Column="1" Content="Frame" Margin="5,10,5,5"
+               HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
+               HorizontalAlignment="Stretch"  VerticalAlignment="Top" NavigationUIVisibility="Hidden"/>
+        
+    </Grid>
+</Window>

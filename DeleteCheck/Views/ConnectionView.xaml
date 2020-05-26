@@ -1,0 +1,34 @@
+﻿<Page x:Class="FPOSPriceUpdater.Views.ConnectionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FPOSPriceUpdater.Views"
+        mc:Ignorable="d"
+      Background="White"
+        Title="Database Settings" MinWidth="300" Width="300">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,5" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="30"/> 
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBox Grid.Row="1" x:Name="Instance" Margin="5,0" 
+                     Text="{Binding Instance, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap"/>
+        <Label Grid.Row="0" Content="Server/Instance" Padding="0,0,0,0" Margin="5,0" />
+        <Label Content="Database" Padding="0,0,0,0"  Grid.Column="1" Margin="5,0"/>
+        <TextBox x:Name="Database" Margin="5,0" Text="{Binding Database, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="1"/>
+        <Button x:Name="BtnTestConnection" Content="Test Connection" 
+                Style="{DynamicResource btnRoundedStyleBlack}"
+                IsEnabled="{Binding IsTestRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+                Padding="5,5,5,5" HorizontalAlignment="Center"  VerticalAlignment="Center"
+                Click="BtnTestConnection_Click"  Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Margin="5,0"/>
+        <Label Content="{Binding ConnectionStatus}" FontSize="20px" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" 
+               Margin="0,0,5,0" Padding="0,0,0,0" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"/>
+    </Grid>
+</Page>
