@@ -21,8 +21,6 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-
-     
             <Button x:Name="btnExportPrices" Grid.Row="0" Style="{DynamicResource btnBoxStyle}" Click="btnExportPrices_Click">
                 <TextBlock Text="Export Prices" TextWrapping="WrapWithOverflow"/>
             </Button>
@@ -32,15 +30,9 @@
             <Button x:Name="btnSettings" Grid.Row="2" Style="{DynamicResource btnBoxStyle}" Click="btnSettings_Click">
                 <TextBlock Text="Settings" TextWrapping="WrapWithOverflow"/>
             </Button>
-            <Button  Grid.Row="3" Style="{DynamicResource btnBoxStyle}" >
-                <TextBlock TextWrapping="WrapWithOverflow"/>
-            </Button>
-            <Button  Grid.Row="4" Style="{DynamicResource btnBoxStyle}" >
-                <TextBlock TextWrapping="WrapWithOverflow"/>
-            </Button>
-            <Button  Grid.Row="5" Style="{DynamicResource btnBoxStyle}">
-                <TextBlock Text="" TextWrapping="WrapWithOverflow"/>
-            </Button>
+            <Button Grid.Row="3" Grid.RowSpan="3" Style="{DynamicResource btnBoxStyle}"/>
+            
+
         </Grid>
         <Frame x:Name="MainFrame" Grid.Column="1" Content="Frame" Margin="5,10,5,5"
                HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
