@@ -106,20 +106,17 @@ namespace FPOSPriceUpdater.ViewModels
                 {
                     List<ItemPriceDTO> items = Serializer.FromCSV(ImportPath);
                     List<ItemPriceDTO> itemsNotUpdated = db.UpdateItemPrices(items);
-                    var totalItems = items.Count();
-                    int totalUpdated;
+                    var totalItems = items.Select(x => x.ItemName).Distinct().Count();
+                    var totalItemsNotUpdated = itemsNotUpdated.Select(x => x.ItemName).Distinct().Count();
+                    var totalItemsUpdated = totalItems - totalItemsNotUpdated;
+
                     if (itemsNotUpdated.Count > 0)
                     {
                         IsPartialImport = true;
-                        totalUpdated = items.Count() - itemsNotUpdated.Count();
                         Serializer.ToFile(itemsNotUpdated, PARTIAL_ITEMS_PATH);
-                    } else
-                    {
-                        totalUpdated = items.Count();
-                    }
-                    ImportStatus =
-                        "Success!" + Environment.NewLine + Environment.NewLine +
-                        "(" + totalUpdated + " of " + totalItems + ")" + " items imported";
+                    } 
+
+                    ImportStatus = totalItemsUpdated + " of " + totalItems + " items imported";
                     IsNotImporting = true;
                 }
                 catch (Exception)
@@ -127,6 +124,7 @@ namespace FPOSPriceUpdater.ViewModels
                     ImportStatus =
                         "Failed!" + Environment.NewLine +
                         "Unable to read import file.";
+                    IsNotImporting = true;
                 }
             });
         }

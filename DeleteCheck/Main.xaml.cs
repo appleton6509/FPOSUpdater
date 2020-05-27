@@ -41,7 +41,7 @@ namespace FPOSPriceUpdater
         private void CreateConnectionString()
         {
             var Instance = "LOCALHOST\\CESSQL";
-            var DBName = "FPOSEMPTY";
+            var DBName = "FPOS5";
             ConnectionString.CreateString(Instance, DBName);
         }
         private void CreateVersion()

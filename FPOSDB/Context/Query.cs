@@ -38,8 +38,6 @@ namespace FPOSDB.Context
         /// <returns></returns>
         public static string SelectAllItemPrices()
         {
-            //return "select * from ItemPrice " +
-            //        "INNER JOIN Item on ItemPrice.ItemID = Item.ItemID";
             return "select * from Item FULL JOIN ItemPrice on Item.ItemId = ItemPrice.ItemID";
         }
 
@@ -72,7 +70,7 @@ namespace FPOSDB.Context
 
         public static string InsertItemPrice(ItemPriceDTO item)
         {
-
+            
             var props = item.GetType().GetProperties();
             string query = "Insert INTO ItemPrice (";
             //query column headers
@@ -108,7 +106,7 @@ namespace FPOSDB.Context
                 "where ItemPrice.ItemID = " +
                 "(select DISTINCT Item.ItemID from Item " +
                 "FULL JOIN ItemPrice on Item.ItemId = ItemPrice.ItemID " +
-                $"where Item.ItemName = '{itemName}')";
+                $"where Item.ItemName = '{CleanItemName(itemName)}')";
             return query;
         }
 
@@ -122,13 +120,19 @@ namespace FPOSDB.Context
         {
             return  "select * from ItemPrice " +
                     "FULL JOIN Item on ItemPrice.ItemID = Item.ItemID " +
-                    $"Where Item.ItemName = '{itemName}' AND ItemPrice.ScheduleIndex = {scheduleIndex}";
+                    $"Where Item.ItemName = '{CleanItemName(itemName)}' AND ItemPrice.ScheduleIndex = {scheduleIndex}";
         }
 
         public static string GetItemByName(string itemName)
         {
             return "select ItemID,ItemName from Item " +
-                    $"Where ItemName = '{itemName}'";
+                    $"Where ItemName = '{CleanItemName(itemName)}'";
+        }
+
+        public static string CleanItemName(string itemName)
+        {
+            string newString = String.Copy(itemName);
+            return newString.Replace("\'", "\'\'");
         }
     }
 }

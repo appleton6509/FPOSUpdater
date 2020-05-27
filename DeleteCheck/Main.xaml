@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FPOSPriceUpdater"
         mc:Ignorable="d"
-        Title="Main" Height="300" Width="465" MinHeight="300" MinWidth="465">
+        Title="Main" Height="400" Width="465" MinHeight="300" MinWidth="465">
     <Grid x:Name="Grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>

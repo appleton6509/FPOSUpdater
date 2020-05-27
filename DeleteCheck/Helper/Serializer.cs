@@ -36,7 +36,7 @@ namespace FPOSPriceUpdater.Helper
                         row += prop.GetValue(item, null);
                         row += ",";
                     }
-                    row.Trim(','); // remove last comma on line
+                    row = row.Trim(','); // remove last comma on line
                     writer.WriteLine(row);
                 }
             }

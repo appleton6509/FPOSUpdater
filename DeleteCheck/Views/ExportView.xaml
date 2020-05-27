@@ -7,7 +7,7 @@
       xmlns:utils="clr-namespace:FPOSPriceUpdater.UserControls"
       mc:Ignorable="d"
       Background="White"
-      Width="300" Height="200" MinHeight="200" MinWidth="300" MaxWidth="300">
+      Width="300" Height="300" MinHeight="200" MinWidth="300" MaxWidth="300">
 
     <Grid VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
@@ -15,22 +15,22 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="50"/>
             <RowDefinition/>
-
             <RowDefinition Height="3*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Bottom" Text="Export Path:" Margin="10,0,10,0" />
+        <TextBlock VerticalAlignment="Bottom" Text="Export Path:" FontSize="20" Margin="10,0,10,0" />
         <utils:FolderEntry Text="{Binding Path=ExportPath}"
-                           VerticalContentAlignment="Center"
-                           Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" Height="25" Description="Folder for export file"/>
+                           VerticalContentAlignment="Center" FontSize="17"
+                           Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" Description="Folder for export file"/>
         <Button x:Name="btnExport" Command="{Binding ClickExport}"
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Content="Export" Grid.Row="2" Grid.ColumnSpan="2"
                 IsEnabled="{Binding IsNotExporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-        <TextBlock VerticalAlignment="Top" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" 
-                   TextAlignment="Center"
+        <TextBlock VerticalAlignment="Center" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" 
+                   TextAlignment="Center" FontSize="20" MinWidth="30"
                    Text="{Binding ExportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
                    Grid.Row="3" Grid.ColumnSpan="2" Margin="0,20,0,0" />
     </Grid>

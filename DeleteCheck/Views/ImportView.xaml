@@ -8,7 +8,7 @@
       xmlns:converter="clr-namespace:FPOSPriceUpdater.Converters"
       mc:Ignorable="d" 
       Background="White"
-      Width="300" Height="200" MinHeight="200" MinWidth="300" MaxWidth="300">
+      Width="300" Height="300" MinHeight="200" MinWidth="300" MaxWidth="300">
     <Page.Resources>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
@@ -18,30 +18,32 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="50"/>
             <RowDefinition/>
             <RowDefinition Height="3*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBlock VerticalAlignment="Bottom" Text="Import File:" Margin="10,0,10,0" />
+        <TextBlock VerticalAlignment="Bottom" Text="Import File:" FontSize="20" Margin="10,0,10,0" />
         <utils:FileEntry Text="{Binding Path=ImportPath}"
-                           VerticalContentAlignment="Center"
-                           Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" Height="25" Description="Path to import file"/>
+                           VerticalContentAlignment="Center" FontSize="17"
+                           Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" VerticalAlignment="Stretch" Description="Path to import file"/>
         <Button x:Name="btnImport" 
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Command="{Binding ClickImport}" 
                 Content="Import" Grid.Row="2" Grid.ColumnSpan="2" 
                 IsEnabled="{Binding IsNotImporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-        <TextBlock VerticalAlignment="Top" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" 
-                   TextAlignment="Center"
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                   TextAlignment="Center" MinWidth="30"
+                   FontSize="20"
                    Text="{Binding ImportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
-                   Grid.Row="3" Grid.ColumnSpan="2" Margin="0,20,0,0" />
+                   Grid.Row="3" Grid.ColumnSpan="2" />
         <Button x:Name="btnFailedImports" 
-                Style="{DynamicResource btnRoundedStyleBlack}"
+                Style="{DynamicResource btnRoundedStyleRed}"
                 Command="{Binding ClickViewFailedImports}" 
-                Content="View Failed Imports" Grid.Row="4" Grid.ColumnSpan="2" 
-                Visibility="{Binding IsPartialImport, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                Content="View Items Not Imported" Grid.Row="4" Grid.ColumnSpan="2" 
+                Visibility="{Binding IsPartialImport, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" 
+                HorizontalAlignment="Center" VerticalAlignment="Top" />
 
     </Grid>
 </Page>

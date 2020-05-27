@@ -1,13 +1,8 @@
 ﻿using FPOSDB.DTO;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Windows;
 
 namespace FPOSDB.Context
 {
@@ -38,175 +33,6 @@ namespace FPOSDB.Context
             }
 
             return result;
-        }
-
-        public ObservableCollection<string> GetOpenTables()
-        {
-            SqlConnection connection = null;
-            SqlCommand command = null;
-            SqlDataReader dataReader = null;
-
-            string sql = "SELECT * FROM Sale WHERE isSuspend=1";
-            connection = new SqlConnection(connectionString);
-            ObservableCollection<string> tables = new ObservableCollection<string>();
-            try
-            {
-                connection.Open();
-                command = new SqlCommand(sql, connection);
-                dataReader = command.ExecuteReader();
-
-                while (dataReader.Read())
-                    tables.Add(dataReader["CheckNumber"].ToString());
-
-            }
-            catch (Exception)
-            {
-                //Do nothing
-            }
-            finally
-            {
-                if (dataReader != null)
-                    dataReader.Close();
-                if (command != null)
-                    command.Dispose();
-                connection.Close();
-            }
-
-            return tables;
-        }
-
-        public int DeleteSale(int checkNumber)
-        {
-            int rowsUpdated = 0;
-
-            string sql = "DELETE FROM Sale WHERE CheckNumber=@checknumber";
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@checknumber", checkNumber.ToString());
-            try
-            {
-                connection.Open();
-                try
-                {
-                    rowsUpdated = cmd.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally { cmd.Dispose(); }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return rowsUpdated;
-        }
-
-        public int DeleteItemSold(int checkNumber)
-        {
-            int rowsUpdated = 0;
-
-            string sql = "DELETE FROM ItemSold WHERE CheckNumber=@checknumber";
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@checknumber", checkNumber.ToString());
-            try
-            {
-                connection.Open();
-                try
-                {
-                    rowsUpdated = cmd.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally { cmd.Dispose(); }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return rowsUpdated;
-        }
-
-        public int ResetEmpPassword(int employeeId)
-        {
-            int rowsUpdated = 0;
-
-            //query to update EMPLOYEE PASSWORD to: Global_11$
-            string query = Query.UpdateBackOfficePassword(employeeId);
-
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand(query, connection);
-            try
-            {
-                connection.Open();
-                try
-                {
-                    rowsUpdated = cmd.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally { cmd.Dispose(); }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return rowsUpdated;
-        }
-
-        public ObservableCollection<string> GetEmployees()
-        {
-            SqlConnection connection = null;
-            SqlCommand command = null;
-            SqlDataReader dataReader = null;
-
-            string sql = "SELECT EmpID FROM Employee";
-            connection = new SqlConnection(connectionString);
-            ObservableCollection<string> employees = new ObservableCollection<string>();
-            try
-            {
-                connection.Open();
-                command = new SqlCommand(sql, connection);
-                dataReader = command.ExecuteReader();
-
-                while (dataReader.Read())
-                    employees.Add(dataReader["EmpID"].ToString());
-
-            }
-            catch (Exception)
-            {
-                //Do nothing
-            }
-            finally
-            {
-                if (dataReader != null)
-                    dataReader.Close();
-                if (command != null)
-                    command.Dispose();
-                connection.Close();
-            }
-            return employees;
         }
 
         /// <summary>
@@ -261,6 +87,7 @@ namespace FPOSDB.Context
             List<ItemPriceDTO> oldItems = GetAllItemPrices();
             List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(items);
             List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
+            List<ItemPriceDTO> itemsNotImported = new List<ItemPriceDTO>();
 
             //delete all item prices associated with an item name with NO PRICING.
             foreach (ItemPriceDTO item in noPriceItems)
@@ -283,11 +110,21 @@ namespace FPOSDB.Context
             foreach(ItemPriceDTO item in newItems)
             {
                 item.ItemID = GetItemByName(item.ItemName).ItemId;
-                InsertItemPrice(item);
-            }
+                int rowsUpdated = 0;
 
-            return null;
- 
+                //item exists in DB, proceed inserting item price
+                if (!String.IsNullOrEmpty(item.ItemID))
+                    rowsUpdated = InsertItemPrice(item);
+
+                if (rowsUpdated == 0)
+                {
+                    var itemIsInList = itemsNotImported.FirstOrDefault(x => x.ItemName == item.ItemName);
+
+                    if (itemIsInList == null)
+                        itemsNotImported.Add(item);
+                }
+            }
+            return itemsNotImported;
         }
 
         private ItemDTO GetItemByName(string itemName)
@@ -344,9 +181,11 @@ namespace FPOSDB.Context
 
             return rowsUpdated;
         }
-
         public int InsertItemPrice(ItemPriceDTO item)
         {
+            if (String.IsNullOrEmpty(item.ItemID))
+                throw new ArgumentNullException("ItemID for item \"" + item.ItemName + "\" is missing while inserting new item price");
+
             SqlConnection connection = new SqlConnection(connectionString);
             int rowsUpdated = 0;
             try
@@ -432,6 +271,7 @@ namespace FPOSDB.Context
             }
             return returnItem;
         }
+
 
     }
 }

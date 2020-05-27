@@ -65,7 +65,7 @@ namespace FPOSPriceUpdater.ViewModels
 
             if (String.IsNullOrEmpty(ExportPath))
             {
-                ExportStatus = "Export Failed!" + Environment.NewLine + "Export path is missing or invalid";
+                ExportStatus = "Failed!" + Environment.NewLine + "Export path is missing or invalid";
                 return false;
             }
 
@@ -95,8 +95,8 @@ namespace FPOSPriceUpdater.ViewModels
                 {
                     Serializer.ToCsv(items, path);
                     ExportStatus =
-                        "Success!" + Environment.NewLine + Environment.NewLine +
-                        items.Count() + " items exported to:" + Environment.NewLine +
+                        items.Select(x => x.ItemName).Distinct().Count() + " items exported" +
+                        Environment.NewLine + Environment.NewLine +
                         path;
                 }
                 catch (Exception)
