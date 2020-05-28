@@ -1,4 +1,5 @@
 ﻿using FPOSDB.DTO;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -8,6 +9,8 @@ namespace FPOSDB.Context
 {
     public class DBService
     {
+        private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         string connectionString { get; set; }
 
         public DBService(string connectionString)
@@ -23,8 +26,9 @@ namespace FPOSDB.Context
             {
                 connection.Open();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error("Database connection failed", ex);
                 result = false;
             }
             finally
@@ -41,17 +45,15 @@ namespace FPOSDB.Context
         /// <returns></returns>
         public List<ItemPriceDTO> GetAllItemPrices()
         {
-            SqlConnection connection = null;
             SqlCommand command = null;
             SqlDataReader dataReader = null;
-
-            string sql = Query.SelectAllItemPrices();
-
-            connection = new SqlConnection(connectionString);
+            SqlConnection connection = new SqlConnection(connectionString);
             List<ItemPriceDTO> items = new List<ItemPriceDTO>();
             try
             {
                 connection.Open();
+
+                string sql = Query.SelectAllItemPrices();
                 command = new SqlCommand(sql, connection);
                 dataReader = command.ExecuteReader();
                 ItemPriceDTO item;
@@ -68,9 +70,9 @@ namespace FPOSDB.Context
                 }
             
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Do nothing
+                _log.Error("Retrieving all item prices from db to list failed", ex);
             }
             finally
             {
@@ -84,10 +86,10 @@ namespace FPOSDB.Context
             return items;
         }
 
-        public List<ItemPriceDTO> UpdateItemPrices(List<ItemPriceDTO> items)
+        public List<ItemPriceDTO> UpdateItemPrices(List<ItemPriceDTO> itemsToUpdate)
         {
             List<ItemPriceDTO> oldItems = GetAllItemPrices();
-            List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(items);
+            List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
             List<ItemPriceDTO> itemsNotImported = new List<ItemPriceDTO>();
             List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
 
@@ -150,9 +152,9 @@ namespace FPOSDB.Context
                     item.ItemName = dataReader[nameof(item.ItemName)].ToString();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Do nothing
+                _log.Error("Retrieve an item price BY NAME in the DB failed", ex);
             }
             finally
             {
@@ -178,7 +180,9 @@ namespace FPOSDB.Context
                     rowsUpdated = cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception) { /*Do nothing*/ }
+            catch (Exception ex) {
+                _log.Error("Updating an item price in the DB failed", ex);
+            }
             finally { connection.Close(); }
 
             return rowsUpdated;
@@ -199,7 +203,9 @@ namespace FPOSDB.Context
                     rowsUpdated = cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception) { /*Do nothing*/ }
+            catch (Exception ex) {
+                _log.Error("Inserting an item price into the DB failed", ex);
+            }
             finally { connection.Close(); }
 
             return rowsUpdated;
@@ -223,57 +229,12 @@ namespace FPOSDB.Context
                     rowsDeleted = cmd.ExecuteNonQuery();
                 }
             }
-            catch (Exception) { /*Do Nothing*/}
+            catch (Exception ex) {
+                _log.Error("Deleting an item price in the DB failed", ex);
+            }
             finally { connection.Close(); }
 
             return rowsDeleted;
         }
-
-        /// <summary>
-        /// Gets all item prices for a single item given a schedule index and itemname
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        private ItemPriceDTO GetItemPricesByNameAndIndex(ItemPriceDTO item)
-        {
-            if (String.IsNullOrEmpty(item.ItemName) || String.IsNullOrEmpty(item.ScheduleIndex))
-                throw new ArgumentNullException(nameof(GetItemPricesByNameAndIndex), "Item name and scheduled index must have values");
-
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand command = null;
-            SqlDataReader dataReader = null;
-            ItemPriceDTO returnItem = null;
-
-            string sql = Query.GetItemPrice(item.ItemName, item.ScheduleIndex);
-
-            try
-            {
-                connection.Open();
-                command = new SqlCommand(sql, connection);
-                dataReader = command.ExecuteReader();
-
-                while (dataReader.Read())
-                {
-                    returnItem = new ItemPriceDTO();
-                    foreach (var prop in item.GetType().GetProperties())
-                    {
-                        var newValue = dataReader[prop.Name].ToString();
-                        prop.SetValue(item, newValue, null);
-                    }
-                }
-            }
-            catch (Exception) {/*do nothing*/}
-            finally
-            {
-                if (dataReader != null)
-                    dataReader.Close();
-                if (command != null)
-                    command.Dispose();
-                connection.Close();
-            }
-            return returnItem;
-        }
-
-
     }
 }

@@ -119,11 +119,14 @@ namespace FPOSPriceUpdater.ViewModels
                     ImportStatus = totalItemsUpdated + " of " + totalItems + " items imported";
                     IsNotImporting = true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     ImportStatus =
-                        "Failed!" + Environment.NewLine +
-                        "Unable to read import file.";
+                        "Unable to read import file." + Environment.NewLine +
+                                ex.Message;
+                }
+                finally
+                {
                     IsNotImporting = true;
                 }
             });

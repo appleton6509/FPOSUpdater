@@ -12,17 +12,17 @@
     <Page.Resources>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
-    <Grid VerticalAlignment="Stretch">
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition/>
-            <RowDefinition Height="3*"/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Bottom" Text="Import File:" FontSize="20" Margin="10,0,10,0" />
         <utils:FileEntry Text="{Binding Path=ImportPath}"
@@ -33,11 +33,12 @@
                 Command="{Binding ClickImport}" 
                 Content="Import" Grid.Row="2" Grid.ColumnSpan="2" 
                 IsEnabled="{Binding IsNotImporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+        <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"
                    TextAlignment="Center" MinWidth="30"
-                   FontSize="20"
-                   Text="{Binding ImportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
-                   Grid.Row="3" Grid.ColumnSpan="2" />
+                   FontSize="17"
+                   Text="{Binding ImportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
         <Button x:Name="btnFailedImports" 
                 Style="{DynamicResource btnRoundedStyleRed}"
                 Command="{Binding ClickViewFailedImports}" 

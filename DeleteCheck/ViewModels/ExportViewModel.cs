@@ -1,8 +1,10 @@
 ﻿using FPOSDB.Context;
 using FPOSDB.DTO;
 using FPOSPriceUpdater.Helper;
+using log4net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,8 @@ namespace FPOSPriceUpdater.ViewModels
 {
     public class ExportViewModel : BaseViewModel
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private string _exportPath;
         public string ExportPath
         {
@@ -64,7 +68,7 @@ namespace FPOSPriceUpdater.ViewModels
             ExportStatus = String.Empty;
 
             if (String.IsNullOrEmpty(ExportPath))
-            {
+            {  
                 ExportStatus = "Failed!" + Environment.NewLine + "Export path is missing or invalid";
                 return false;
             }
@@ -82,8 +86,9 @@ namespace FPOSPriceUpdater.ViewModels
         {
             if (!IsExportReady())
                 return;
-            IsNotExporting = false;
 
+            log.Info("Beginning export");
+            IsNotExporting = false;
             ExportStatus = "Exporting...";
             DBService db = new DBService(ConnectionString.GetString());
             List<ItemPriceDTO> items = db.GetAllItemPrices();
@@ -94,18 +99,20 @@ namespace FPOSPriceUpdater.ViewModels
                 try
                 {
                     Serializer.ToCsv(items, path);
-                    ExportStatus =
-                        items.Select(x => x.ItemName).Distinct().Count() + " items exported" +
+                    int itemsexported = items.Select(x => x.ItemName).Distinct().Count();
+                    ExportStatus = itemsexported + " items exported" +
                         Environment.NewLine + Environment.NewLine +
                         path;
+                    log.Info($"Exported {itemsexported} items");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    log.Debug("Export failed", ex);
                     ExportStatus =
-                        "Failed!" + Environment.NewLine +
-                        "Unable to write to export file.";
+                        "Unable to write to export file. " + ex.Message;
                 }
             });
+            log.Info("Export Complete");
             IsNotExporting = true;
         }
     }

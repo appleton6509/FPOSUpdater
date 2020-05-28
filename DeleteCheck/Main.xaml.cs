@@ -1,5 +1,6 @@
 ﻿using FPOSDB.Context;
 using FPOSPriceUpdater.Helper;
+using log4net;
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -11,31 +12,17 @@ namespace FPOSPriceUpdater
     /// <summary>
     /// Interaction logic for Main.xaml
     /// </summary>
-    public partial class Main : Window, INotifyPropertyChanged
+    public partial class Main : Window
     {
-        private string _version;
-        public string Version
-        {
-            get
-            {
-                return this._version;
-            }
-            set
-            {
-                if (value != _version)
-                {
-                    this._version = "v" + value;
-                    RaisePropertyChange(nameof(Version));
-                }
-            }
-        }
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public Main()
         {
             InitializeComponent();
-            CreateVersion();
+            log4net.Config.XmlConfigurator.Configure();
             CreateConnectionString();
             MainFrame.Content = Navigator.ConnectionView;
+            log.Info("App Started");
         }
 
         private void CreateConnectionString()
@@ -43,19 +30,6 @@ namespace FPOSPriceUpdater
             var Instance = "LOCALHOST\\CESSQL";
             var DBName = "FPOS5";
             ConnectionString.CreateString(Instance, DBName);
-        }
-        private void CreateVersion()
-        {
-            try
-            {
-                Version = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
-            }
-            catch (Exception)
-            {
-                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-
-            this.Title = "FPOS Price Updater " + Version;
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e)
@@ -71,15 +45,6 @@ namespace FPOSPriceUpdater
         private void btnImportPrices_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Content = Navigator.ImportView;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public virtual void RaisePropertyChange(string propertyName)
-        {
-            if (String.IsNullOrEmpty(propertyName))
-                return;
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

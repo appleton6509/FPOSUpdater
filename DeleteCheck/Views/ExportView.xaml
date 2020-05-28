@@ -15,11 +15,11 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition/>
-            <RowDefinition Height="3*"/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Bottom" Text="Export Path:" FontSize="20" Margin="10,0,10,0" />
         <utils:FolderEntry Text="{Binding Path=ExportPath}"
@@ -29,9 +29,11 @@
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Content="Export" Grid.Row="2" Grid.ColumnSpan="2"
                 IsEnabled="{Binding IsNotExporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-        <TextBlock VerticalAlignment="Center" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" 
-                   TextAlignment="Center" FontSize="20" MinWidth="30"
-                   Text="{Binding ExportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
-                   Grid.Row="3" Grid.ColumnSpan="2" Margin="0,20,0,0" />
+        <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   TextAlignment="Center" FontSize="17" MinWidth="30"
+                   Text="{Binding ExportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+
     </Grid>
 </Page>

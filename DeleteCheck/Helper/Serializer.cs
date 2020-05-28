@@ -1,4 +1,5 @@
 ﻿using FPOSDB.DTO;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,41 +10,7 @@ namespace FPOSPriceUpdater.Helper
 {
     public static class Serializer
     {
-        /// <summary>
-        /// Exports a list of objects to a CSV file
-        /// </summary>
-        /// <typeparam name="T">Type of object</typeparam>
-        /// <param name="data">data to be exported</param>
-        /// <param name="path">full path to csv file</param>
-        public static void ToCsvvvv<T>(List<T> data, string path)
-        {
-            using (StreamWriter writer = new StreamWriter(path, false))
-            {
-                //write the headers
-                string headerRow = "";
-
-                foreach (var prop in new ItemPriceDTO().GetType().GetProperties())
-                {
-                    headerRow += prop.Name;
-                    headerRow += ",";
-                }
-                headerRow.Trim(','); // remove last comma on line
-                writer.WriteLine(headerRow);
-
-                //write the data
-                foreach (var item in data)
-                {
-                    string row = "";
-                    foreach (var prop in item.GetType().GetProperties())
-                    {
-                        row += prop.GetValue(item, null);
-                        row += ",";
-                    }
-                    row = row.Trim(','); // remove last comma on line
-                    writer.WriteLine(row);
-                }
-            }
-        }
+        private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Exports a list of objects to a CSV file
@@ -70,7 +37,6 @@ namespace FPOSPriceUpdater.Helper
                         writer.WriteLine(row);
                     }
                 }
-                string test = "blah";
             }
         }
 
@@ -104,18 +70,20 @@ namespace FPOSPriceUpdater.Helper
             {
                 ItemPriceDTO item;
                 string[] headers = reader.ReadLine().Split(';');
+
                 string line;
                 while ((line = reader.ReadLine()) != null) {
                     string[] row = line.Split(';');
                     item = new ItemPriceDTO();
-
                     for (int i = 0; i < headers.Length; i++)
                     {
                         try
                         {
                             string newValue = row[i];
                             item.GetType().GetProperty(headers[i]).SetValue(item, newValue, null);
-                        } catch(Exception) { /*do nothing*/ }
+                        } catch(Exception ex) { 
+                            _log.Error("Converting CSV cell to object resulted in an error",ex); 
+                        }
                     }
                     items.Add(item);  
                 }
