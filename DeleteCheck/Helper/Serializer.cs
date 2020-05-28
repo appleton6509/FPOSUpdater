@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace FPOSPriceUpdater.Helper
 {
@@ -13,12 +15,13 @@ namespace FPOSPriceUpdater.Helper
         /// <typeparam name="T">Type of object</typeparam>
         /// <param name="data">data to be exported</param>
         /// <param name="path">full path to csv file</param>
-        public static void ToCsv<T>(List<T> data, string path)
+        public static void ToCsvvvv<T>(List<T> data, string path)
         {
             using (StreamWriter writer = new StreamWriter(path, false))
             {
                 //write the headers
                 string headerRow = "";
+
                 foreach (var prop in new ItemPriceDTO().GetType().GetProperties())
                 {
                     headerRow += prop.Name;
@@ -41,6 +44,36 @@ namespace FPOSPriceUpdater.Helper
                 }
             }
         }
+
+        /// <summary>
+        /// Exports a list of objects to a CSV file
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="data">data to be exported</param>
+        /// <param name="path">full path to csv file</param>
+        public static void ToCsv(List<ItemPriceDTO> data, string path)
+        {
+            using (StreamWriter writer = new StreamWriter(path, false))
+            {
+                StringBuilder str = new StringBuilder();
+                
+                //write the headers
+                string headers = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.Name).ToArray());
+                writer.WriteLine(headers);
+
+                //write the data
+                foreach (ItemPriceDTO item in data)
+                {
+                    if (!String.IsNullOrEmpty(item.ItemName) && !String.IsNullOrEmpty(item.ItemID))
+                    {
+                        var row = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.GetValue(item, null).ToString()).ToArray());
+                        writer.WriteLine(row);
+                    }
+                }
+                string test = "blah";
+            }
+        }
+
         /// <summary>
         /// Exports a list of objects to a CSV file
         /// </summary>
@@ -70,13 +103,13 @@ namespace FPOSPriceUpdater.Helper
             using(StreamReader reader = new StreamReader(path))
             {
                 ItemPriceDTO item;
-                string[] headers = reader.ReadLine().Split(',');
+                string[] headers = reader.ReadLine().Split(';');
                 string line;
                 while ((line = reader.ReadLine()) != null) {
-                    string[] row = line.Split(',');
+                    string[] row = line.Split(';');
                     item = new ItemPriceDTO();
 
-                    for (int i = 0; i < headers.Length - 1; i++)
+                    for (int i = 0; i < headers.Length; i++)
                     {
                         try
                         {

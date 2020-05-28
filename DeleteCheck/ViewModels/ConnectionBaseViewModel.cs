@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FPOSPriceUpdater.ViewModels
 {
@@ -68,6 +69,7 @@ namespace FPOSPriceUpdater.ViewModels
             DBService db = new DBService(ConnectionString.GetString());
             Task.Run(() =>
             {
+                ConnectionStatus = "Trying to connect...";
                 bool isValid = db.IsConnectionValid();
                 IsConnected = isValid;
                 IsTestRunning = false;
@@ -75,6 +77,7 @@ namespace FPOSPriceUpdater.ViewModels
                     ConnectionStatus = "Connected!";
                 else
                     ConnectionStatus = "Not Connected";
+
             });
         }
 

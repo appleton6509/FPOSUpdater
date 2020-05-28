@@ -60,11 +60,13 @@ namespace FPOSDB.Context
                     item = new ItemPriceDTO();
                     foreach(var prop in item.GetType().GetProperties())
                     {
-                            var newValue = dataReader[prop.Name].ToString();
+                            string newValue = dataReader[prop.Name].ToString();
                             prop.SetValue(item, newValue, null);
                     }
+
                     items.Add(item);
                 }
+            
             }
             catch (Exception)
             {
@@ -86,15 +88,15 @@ namespace FPOSDB.Context
         {
             List<ItemPriceDTO> oldItems = GetAllItemPrices();
             List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(items);
-            List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
             List<ItemPriceDTO> itemsNotImported = new List<ItemPriceDTO>();
+            List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
 
             //delete all item prices associated with an item name with NO PRICING.
             foreach (ItemPriceDTO item in noPriceItems)
             {
-                DeleteItemPricesByName(item.ItemName);
-                newItems.Remove(item);
-                oldItems.RemoveAll(x => x.ItemName.ToUpper() == item.ItemName.ToUpper());
+                    DeleteItemPricesByName(item.ItemName);
+                    newItems.Remove(item);
+                    oldItems.RemoveAll(x => x.ItemName.ToUpper() == item.ItemName.ToUpper());
             }
 
             //find matches of item names between the old and new pricing

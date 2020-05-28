@@ -38,7 +38,8 @@ namespace FPOSDB.Context
         /// <returns></returns>
         public static string SelectAllItemPrices()
         {
-            return "select * from Item FULL JOIN ItemPrice on Item.ItemId = ItemPrice.ItemID";
+            return "select * from Item FULL JOIN ItemPrice on Item.ItemId = ItemPrice.ItemID " +
+                "WHERE ITEM.ItemName <> '' and item.ItemName IS NOT NULL order by Item.ItemName";
         }
 
         /// <summary>
