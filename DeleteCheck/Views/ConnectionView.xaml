@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FPOSPriceUpdater.Views"
         mc:Ignorable="d"
         Background="White"
-        Width="300" Height="300" MinHeight="200" MinWidth="300" MaxWidth="300">
+        Width="300" Height="430" MinHeight="430" MinWidth="300" MaxWidth="300">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,5" >
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>

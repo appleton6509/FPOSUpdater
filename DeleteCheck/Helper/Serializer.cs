@@ -23,7 +23,7 @@ namespace FPOSPriceUpdater.Helper
             using (StreamWriter writer = new StreamWriter(path, false))
             {
                 StringBuilder str = new StringBuilder();
-                
+
                 //write the headers
                 string headers = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.Name).ToArray());
                 writer.WriteLine(headers);
@@ -46,14 +46,21 @@ namespace FPOSPriceUpdater.Helper
         /// <typeparam name="T">Type of object</typeparam>
         /// <param name="data">data to be exported</param>
         /// <param name="path">full path to csv file</param>
-        public static void ToFile<T>(List<T> data, string path)
+        public static void ToFile(List<ItemPriceDTO> data, string fileName)
         {
+            var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\" + fileName;
             using (StreamWriter writer = new StreamWriter(path, false))
             {
+                List<string> itemsDone = new List<string>();
+                
                 writer.WriteLine(DateTime.Now);
                 foreach(var item in data)
                 {
-                    writer.WriteLine(item);
+                    if (!itemsDone.Contains(item.ItemName))
+                    {
+                        writer.WriteLine(item);
+                        itemsDone.Add(item.ItemName);
+                    }
                 }
             }
         }

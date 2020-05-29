@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FPOSPriceUpdater"
         mc:Ignorable="d"
-        Title="FPOS Price Updator" Height="470" Width="650" MinHeight="300" MinWidth="465" WindowStartupLocation="CenterScreen">
+        Title="FPOS Price Updator" MinHeight="470" Height="470" Width="650"  MinWidth="465" WindowStartupLocation="CenterScreen">
     <Grid x:Name="Grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
@@ -35,7 +35,7 @@
 
         </Grid>
         <Frame x:Name="MainFrame" Grid.Column="1" Content="Frame" Margin="5,10,5,5"
-               HorizontalContentAlignment="Center" VerticalContentAlignment="Top"
+               HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                HorizontalAlignment="Stretch"  VerticalAlignment="Top" NavigationUIVisibility="Hidden"/>
 
     </Grid>

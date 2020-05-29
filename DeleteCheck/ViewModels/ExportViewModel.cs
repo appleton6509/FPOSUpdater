@@ -14,7 +14,7 @@ namespace FPOSPriceUpdater.ViewModels
 {
     public class ExportViewModel : BaseViewModel
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private string _exportPath;
         public string ExportPath
@@ -70,50 +70,49 @@ namespace FPOSPriceUpdater.ViewModels
             if (String.IsNullOrEmpty(ExportPath))
             {  
                 ExportStatus = "Failed!" + Environment.NewLine + "Export path is missing or invalid";
+                _log.Error("Export did not start as export path is null or empty");
                 return false;
             }
 
             DBService db = new DBService(ConnectionString.GetString());
             if (!db.IsConnectionValid())
             {
-                ExportStatus = "Failed!" +
-                    Environment.NewLine + "Check your database connection.";
+                ExportStatus = "Failed!" + Environment.NewLine + "Check your database connection.";
+                _log.Error("Export did not start as database connection is invalid");
                 return false;
             }
             return true;
         }
         private void ClickExportCommand(object obj = null)
         {
+            _log.Info("***** Export is starting *****");
             if (!IsExportReady())
                 return;
 
-            log.Info("Beginning export");
             IsNotExporting = false;
             ExportStatus = "Exporting...";
             DBService db = new DBService(ConnectionString.GetString());
             List<ItemPriceDTO> items = db.GetAllItemPrices();
             string path = $"{ExportPath}\\export.csv";
-
             Task.Run(() =>
             {
                 try
                 {
                     Serializer.ToCsv(items, path);
                     int itemsexported = items.Select(x => x.ItemName).Distinct().Count();
-                    ExportStatus = itemsexported + " items exported" +
-                        Environment.NewLine + Environment.NewLine +
-                        path;
-                    log.Info($"Exported {itemsexported} items");
+                    ExportStatus = itemsexported + " items exported" + Environment.NewLine + Environment.NewLine + path;
+                    _log.Info($"Exported {itemsexported} items and {items.Count()} items prices");
                 }
                 catch (Exception ex)
                 {
-                    log.Debug("Export failed", ex);
+                    _log.Error("Unable to write to export file. ", ex);
                     ExportStatus =
                         "Unable to write to export file. " + ex.Message;
+                    _log.Error("Export has failed", ex);
                 }
             });
-            log.Info("Export Complete");
             IsNotExporting = true;
+            _log.Info("***** Export is ended *****");
         }
     }
 }

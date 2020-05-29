@@ -8,7 +8,7 @@
       xmlns:converter="clr-namespace:FPOSPriceUpdater.Converters"
       mc:Ignorable="d" 
       Background="White"
-      Width="300" Height="300" MinHeight="200" MinWidth="300" MaxWidth="300">
+      Width="300" Height="430" MinHeight="430" MinWidth="300" MaxWidth="300">
     <Page.Resources>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
@@ -34,17 +34,29 @@
                 Content="Import" Grid.Row="2" Grid.ColumnSpan="2" 
                 IsEnabled="{Binding IsNotImporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
         <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"
+            <Border>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"
                    TextAlignment="Center" MinWidth="30"
                    FontSize="17"
                    Text="{Binding ImportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+            </Border>
+
         </Grid>
-        <Button x:Name="btnFailedImports" 
-                Style="{DynamicResource btnRoundedStyleRed}"
-                Command="{Binding ClickViewFailedImports}" 
-                Content="View Items Not Imported" Grid.Row="4" Grid.ColumnSpan="2" 
-                Visibility="{Binding IsPartialImport, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" 
-                HorizontalAlignment="Center" VerticalAlignment="Top" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="4" Grid.ColumnSpan="2" >
+            <Button x:Name="btnFailedItems" 
+                Style="{DynamicResource btnRoundedStyleRed}" FontSize="14" Command="{Binding ClickViewFailedItems}" 
+                Content="Failed" VerticalAlignment="Top" Margin="5,0,5,0"
+                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <Button x:Name="btnImportedItems" 
+                Style="{DynamicResource btnRoundedStyleBlack}" FontSize="14" Command="{Binding ClickViewImportedItems}" 
+                Content="Imported" VerticalAlignment="Top" Margin="5,0,5,0"
+                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <Button x:Name="btnIgnoredItems" 
+                Style="{DynamicResource btnRoundedStyleBlack}" FontSize="14" Command="{Binding ClickViewIgnoredItems}" 
+                Content="Ignored" VerticalAlignment="Top" Margin="5,0,5,0"
+                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/> 
+        </StackPanel>
+
 
     </Grid>
 </Page>

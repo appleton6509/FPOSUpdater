@@ -1,9 +1,11 @@
 ﻿using FPOSDB.DTO;
+using FPOSDB.Parameters;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FPOSDB.Context
 {
@@ -62,7 +64,7 @@ namespace FPOSDB.Context
                     item = new ItemPriceDTO();
                     foreach(var prop in item.GetType().GetProperties())
                     {
-                            string newValue = dataReader[prop.Name].ToString();
+                        string newValue = dataReader[prop.Name].ToString().ToUpper();
                             prop.SetValue(item, newValue, null);
                     }
 
@@ -86,52 +88,152 @@ namespace FPOSDB.Context
             return items;
         }
 
-        public List<ItemPriceDTO> UpdateItemPrices(List<ItemPriceDTO> itemsToUpdate)
+        public ImportResult UpdateItemPrices(List<ItemPriceDTO> itemsToUpdate)
         {
-            List<ItemPriceDTO> oldItems = GetAllItemPrices();
             List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
-            List<ItemPriceDTO> itemsNotImported = new List<ItemPriceDTO>();
-            List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
+            List<ItemPriceDTO> matchinItems = new List<ItemPriceDTO>();
+            ImportResult result = new ImportResult();
 
-            //delete all item prices associated with an item name with NO PRICING.
-            foreach (ItemPriceDTO item in noPriceItems)
+            foreach (ItemPriceDTO item in newItems)
             {
-                    DeleteItemPricesByName(item.ItemName);
-                    newItems.Remove(item);
-                    oldItems.RemoveAll(x => x.ItemName.ToUpper() == item.ItemName.ToUpper());
-            }
+                item.ItemID = GetItemIdByItemName(item.ItemName);
 
-            //find matches of item names between the old and new pricing
-            var matchingItems = oldItems.Select(x => x.ItemName).Intersect(newItems.Select(x => x.ItemName));
-
-            //delete in DB any items that have price updates
-            foreach(string itemName in matchingItems)
-            {
-                DeleteItemPricesByName(itemName);
-            }
-
-            //insert in DB the new prices
-            foreach(ItemPriceDTO item in newItems)
-            {
-                item.ItemID = GetItemByName(item.ItemName).ItemId;
-                int rowsUpdated = 0;
-
-                //item exists in DB, proceed inserting item price
-                if (!String.IsNullOrEmpty(item.ItemID))
-                    rowsUpdated = InsertItemPrice(item);
-
-                if (rowsUpdated == 0)
+                if (String.IsNullOrEmpty(item.ItemID))
+                    result.Ignored.Add(item);
+                else
                 {
-                    var itemIsInList = itemsNotImported.FirstOrDefault(x => x.ItemName == item.ItemName);
-
-                    if (itemIsInList == null)
-                        itemsNotImported.Add(item);
+                    matchinItems.Add(item);
+                    DeleteItemPricesByName(item.ItemName);
                 }
             }
-            return itemsNotImported;
+            foreach (ItemPriceDTO item in matchinItems)
+            {
+                if (item.IsZeroPrice())
+                    result.Imported.Add(item);
+                else
+                {
+                    var rowsInserted = InsertItemPrice(item);
+                    if (rowsInserted > 0)
+                        result.Imported.Add(item);
+                    else
+                        result.Failed.Add(item);
+                }
+            }
+            return result;
         }
 
-        private ItemDTO GetItemByName(string itemName)
+        //public ImportResult UpdateItemPricess(List<ItemPriceDTO> itemsToUpdate)
+        //{
+        //    List<ItemPriceDTO> oldItems = GetAllItemPrices();
+        //    List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
+        //    List<ItemPriceDTO> itemsImportFailed = new List<ItemPriceDTO>();
+        //    List<ItemPriceDTO> itemsHandled = new List<ItemPriceDTO>();
+        //    List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
+        //    var matchingItems = oldItems.Select(x => x.ItemName).Intersect(newItems.Select(x => x.ItemName)).ToList();
+        //    ImportResult result = new ImportResult();
+
+        //    //delete all item prices associated with an item name with NO PRICING.
+        //    foreach (ItemPriceDTO item in noPriceItems)
+        //    {
+        //        var existingItem = GetItemIdByItemName(item.ItemName);
+
+        //        if (existingItem != null)
+        //        {
+        //            DeleteItemPricesByName(item.ItemName);
+        //            result.SuccessItems.Add(item);
+        //            //itemsHandled.Add(item);
+        //        }
+        //        else
+        //        {
+        //            result.IgnoredItems.Add(item);
+        //        }
+        //        newItems.Remove(item);
+        //    }
+
+
+        //    //insert in DB the new prices
+        //    foreach (ItemPriceDTO item in newItems)
+        //    {
+        //        item.ItemID = GetItemIdByItemName(item.ItemName);
+        //        int itemHandled = 0;
+
+        //        //item exists in both DB's, proceed inserting item price
+        //        if (!String.IsNullOrEmpty(item.ItemID))
+        //        {
+        //            DeleteItemPricesByName(item.ItemName);
+        //            itemHandled = InsertItemPrice(item);
+        //        }
+        //        else
+        //        {
+        //            result.IgnoredItems.Add(item);
+        //            itemsHandled.Add(item);
+        //            itemHandled = 1;
+        //        }
+
+        //        if (itemHandled == 0)
+        //        {
+        //            var isAlreadyInList = itemsImportFailed.FirstOrDefault(x => x.ItemName == item.ItemName) != null ? true : false;
+        //            var isAlreadyImported = itemsHandled.FirstOrDefault(x => x.ItemName == item.ItemName) != null ? true : false;
+
+        //            if (!isAlreadyInList || !isAlreadyImported)
+        //                itemsImportFailed.Add(item);
+        //        }
+        //        else
+        //        {
+        //            result.SuccessItems.Add(item);
+        //        }
+        //    }
+        //    return itemsImportFailed;
+        //}
+
+
+        //public List<ItemPriceDTO> UpdateItemPricess(List<ItemPriceDTO> itemsToUpdate)
+        //{
+        //    List<ItemPriceDTO> oldItems = GetAllItemPrices();
+        //    List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
+        //    List<ItemPriceDTO> itemsNotImported = new List<ItemPriceDTO>();
+        //    List<ItemPriceDTO> itemsImported = new List<ItemPriceDTO>();
+        //    List<ItemPriceDTO> noPriceItems = newItems.Where(x => x.IsZeroPrice()).ToList();
+
+        //    //delete all item prices associated with an item name with NO PRICING.
+        //    foreach (ItemPriceDTO item in noPriceItems)
+        //    {
+        //        DeleteItemPricesByName(item.ItemName);
+        //        itemsImported.Add(item);
+        //    }
+
+        //    //find matches of item names between the old and new pricing
+        //    var matchingItems = oldItems.Select(x => x.ItemName).Intersect(newItems.Select(x => x.ItemName)).ToList();
+
+        //    //delete in DB any items that have price updates
+        //    foreach (string itemName in matchingItems)
+        //    {
+        //        DeleteItemPricesByName(itemName);
+        //    }
+
+        //    //insert in DB the new prices
+        //    foreach (ItemPriceDTO item in newItems)
+        //    {
+        //        item.ItemID = GetItemIdByItemName(item.ItemName).ItemId;
+        //        int rowsUpdated = 0;
+
+        //        //item exists in DB, proceed inserting item price
+        //        if (!Object.Equals(item, null) && !String.IsNullOrEmpty(item.ItemID))
+        //            rowsUpdated = InsertItemPrice(item);
+
+        //        if (rowsUpdated == 0)
+        //        {
+        //            var isAlreadyInList = itemsNotImported.FirstOrDefault(x => x.ItemName == item.ItemName) != null ? true : false;
+        //            var isAlreadyImported = itemsImported.FirstOrDefault(x => x.ItemName == item.ItemName) != null ? true : false;
+
+        //            if (!isAlreadyInList || !isAlreadyImported)
+        //                itemsNotImported.Add(item);
+        //        }
+        //    }
+        //    return itemsNotImported;
+        //}
+
+        private string GetItemIdByItemName(string itemName)
         {
             SqlConnection connection = null;
             SqlCommand command = null;
@@ -164,7 +266,7 @@ namespace FPOSDB.Context
                     command.Dispose();
                 connection.Close();
             }
-            return item;
+            return item.ItemId;
         }
 
         public int UpdateItemPrice(ItemPriceDTO newItem, ItemPriceDTO existingItem)

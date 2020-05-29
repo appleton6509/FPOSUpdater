@@ -47,7 +47,7 @@ namespace FPOSDB.Context
         public static string UpdateExistingItemPrice(ItemPriceDTO newItem, ItemPriceDTO existingItem)
         {
             if ((newItem.ScheduleIndex != existingItem.ScheduleIndex) ||
-                (newItem.ItemName.ToLower() != existingItem.ItemName.ToLower()))
+                (newItem.ItemName != existingItem.ItemName))
                 throw new ArgumentNullException(nameof(UpdateExistingItemPrice), "Item name and scheduled index must match!");
 
             var props = newItem.GetType().GetProperties();
