@@ -1,11 +1,12 @@
 ﻿using FPOSDB.Context;
+using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-
+using System.Windows.Controls;
 
 namespace FPOSPriceUpdater
 {
@@ -21,7 +22,7 @@ namespace FPOSPriceUpdater
             InitializeComponent();
             log4net.Config.XmlConfigurator.Configure();
             CreateConnectionString();
-            MainFrame.Content = Navigator.ConnectionView;
+            setView(PageView.Connection);
             log.Info("App Started");
         }
 
@@ -34,17 +35,22 @@ namespace FPOSPriceUpdater
 
         private void btnSettings_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Content = Navigator.ConnectionView;
+            setView(PageView.Connection);
         }
 
         private void btnExportPrices_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Content = Navigator.ExportView;
+            setView(PageView.Export);
         }
 
         private void btnImportPrices_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Content = Navigator.ImportView;
+            setView(PageView.Import);
+        }
+
+        private void setView(PageView page)
+        {
+            Navigator.ChangeView(page, MainFrame);
         }
     }
 }

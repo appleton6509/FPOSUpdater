@@ -88,11 +88,13 @@ namespace FPOSDB.Context
             return items;
         }
 
+
         public ImportResult UpdateItemPrices(List<ItemPriceDTO> itemsToUpdate)
         {
             List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
             List<ItemPriceDTO> matchinItems = new List<ItemPriceDTO>();
             ImportResult result = new ImportResult();
+
 
             foreach (ItemPriceDTO item in newItems)
             {
@@ -106,6 +108,7 @@ namespace FPOSDB.Context
                     DeleteItemPricesByName(item.ItemName);
                 }
             }
+
             foreach (ItemPriceDTO item in matchinItems)
             {
                 if (item.IsZeroPrice())
@@ -119,6 +122,7 @@ namespace FPOSDB.Context
                         result.Failed.Add(item);
                 }
             }
+
             return result;
         }
 

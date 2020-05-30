@@ -30,7 +30,7 @@
     <ProductName>FPOS Price Updator</ProductName>
     <PublisherName>Condor POS</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>16</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -106,6 +106,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Enum\TransferStatus.cs" />
+    <Compile Include="Enum\PageView.cs" />
     <Compile Include="Helper\Navigator.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\Serializer.cs" />

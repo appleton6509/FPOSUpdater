@@ -1,6 +1,7 @@
 ﻿using FPOSDB.Context;
 using FPOSDB.DTO;
 using FPOSDB.Parameters;
+using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
@@ -129,19 +130,16 @@ namespace FPOSPriceUpdater.ViewModels
 
         private void ClickImportCommand(object obj = null)
         {
-            _log.Info("***** Import is starting *****");
-            IsImportDone = false;
-
             if (!IsImportReady())
                 return;
 
-            IsNotImporting = false;
-            ImportStatus = "Importing...";
-            DBService db = new DBService(ConnectionString.GetString());
+            SetImportStatus(TransferStatus.Started, "Importing...");
+ 
             Task.Run(() =>
             {
                 try
                 {
+                    DBService db = new DBService(ConnectionString.GetString());
                     List<ItemPriceDTO> items = Serializer.FromCSV(ImportPath);
                     ImportResult results = db.UpdateItemPrices(items);
 
@@ -158,43 +156,65 @@ namespace FPOSPriceUpdater.ViewModels
                     message += "Total Imported:  " + importedItems + Environment.NewLine;
                     message += "Total Failed:  " + failedItems + Environment.NewLine;
 
-                    IsImportDone = true;
-
-                    ImportStatus = message;
                     ImportResultsToFile(results);
-                    _log.Info(message);
+                    SetImportStatus(TransferStatus.Success, message);
                 }
                 catch (Exception ex)
                 {
-                    ImportStatus =
-                        "Unable to read import file." + Environment.NewLine +
-                                ex.Message;
-                    _log.Error("Import failed", ex);
+                    SetImportStatus(TransferStatus.Failed, "Unable to read import file." + Environment.NewLine, ex);
                 }
-                finally
-                {
-                    IsNotImporting = true;
-                    _log.Info("***** Import is ended *****");
-                }
+                
+                SetImportStatus(TransferStatus.Stopped, "");
             });
         }
+
+        private void SetImportStatus(TransferStatus status, string ImportMessage, Exception ex = null)
+        {
+            switch (status)
+            {
+                case Enum.TransferStatus.Started:
+                    IsImportDone = false;
+                    IsNotImporting = false;
+                    ImportStatus = ImportMessage;
+                    _log.Info("***** Import Started *****");
+                    break;
+                case Enum.TransferStatus.Failed:
+                    IsImportDone = true;
+                    IsNotImporting = true;
+                    ImportStatus = ImportMessage;
+                    _log.Error(ImportMessage, ex);
+                    _log.Error("***** Import Failed *****");
+                    break;
+                case TransferStatus.StartFailure:
+                    ImportStatus = ImportMessage;
+                    _log.Error(ImportMessage);
+                    break;
+                case Enum.TransferStatus.Stopped:
+                    IsImportDone = true;
+                    IsNotImporting = true;
+                    _log.Info("***** Import Stopped *****");
+                    break;
+                case Enum.TransferStatus.Success:
+                    IsImportDone = true;
+                    IsNotImporting = true;
+                    _log.Info(ImportMessage);
+                    ImportStatus = ImportMessage;
+                    _log.Info("***** Import Successful *****");
+                    break;
+            }
+        }
+
         public bool IsImportReady()
         {
-            ImportStatus = String.Empty;
-
-            if (String.IsNullOrEmpty(ImportPath))
+            if (String.IsNullOrEmpty(ImportPath) || !File.Exists(ImportPath))
             {
-                ImportStatus = "Failed!" + Environment.NewLine + "Import file is missing or invalid";
-                _log.Error("Import did not start as import path is null or empty");
+                SetImportStatus(TransferStatus.StartFailure, "Failed!" + Environment.NewLine + "Import file is missing or invalid");
                 return false;
             }
-
             DBService db = new DBService(ConnectionString.GetString());
             if (!db.IsConnectionValid())
             {
-                ImportStatus = "Failed!" +
-                    Environment.NewLine + "Check your database connection.";
-                _log.Error("Import did not start as database connection is invalid");
+                SetImportStatus(TransferStatus.StartFailure, $"Failed! {Environment.NewLine} Check your database connection.");
                 return false;
             }
             return true;

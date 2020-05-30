@@ -1,4 +1,6 @@
-﻿using FPOSPriceUpdater.Views;
+﻿using FPOSPriceUpdater.Enum;
+using FPOSPriceUpdater.Views;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace FPOSPriceUpdater.Helper
@@ -35,6 +37,34 @@ namespace FPOSPriceUpdater.Helper
                     _export = new ExportView();
                 return _export;
             }
+        }
+        public static void ChangeView(PageView page, Frame frame)
+        {
+            ConnectionView.Visibility = Visibility.Hidden;
+            ImportView.Visibility = Visibility.Hidden;
+            ExportView.Visibility = Visibility.Hidden;
+            Page displayPage;
+
+            switch (page)
+            {
+                case PageView.Import:
+                    ImportView.Visibility = Visibility.Visible;
+                    displayPage = ImportView;
+                    break;
+                case PageView.Connection:
+                    ConnectionView.Visibility = Visibility.Visible;
+                    displayPage = ConnectionView;
+                    break;
+                case PageView.Export:
+                    ExportView.Visibility = Visibility.Visible;
+                    displayPage = ExportView;
+                    break;
+                default:
+                    ConnectionView.Visibility = Visibility.Visible;
+                    displayPage = ConnectionView;
+                    break;
+            }
+            frame.Content = displayPage;
         }
     }
 }

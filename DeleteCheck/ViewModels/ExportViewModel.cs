@@ -1,13 +1,16 @@
 ﻿using FPOSDB.Context;
 using FPOSDB.DTO;
+using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FPOSPriceUpdater.ViewModels
@@ -63,56 +66,89 @@ namespace FPOSPriceUpdater.ViewModels
             ClickExport = new RelayCommand<object>(ClickExportCommand);
         }
 
+        private void ClickExportCommand(object obj = null)
+        {
+            if (!IsExportReady())
+                return;
+
+            SetExportStatus(Enum.TransferStatus.Started, "Exporting...");
+            Task.Run(() =>
+            {
+                DBService db = new DBService(ConnectionString.GetString());
+                List<ItemPriceDTO> items = new List<ItemPriceDTO>();
+
+                int itemsexported = 9;
+                string path = $"{ExportPath}\\export.csv";
+                try
+                {
+                    items = db.GetAllItemPrices();
+                    Serializer.ToCsv(items, path);
+                    itemsexported = items.Select(x => x.ItemName).Distinct().Count();
+                    SetExportStatus(Enum.TransferStatus.Success, $"{itemsexported} items exported {Environment.NewLine} {path}");
+                }
+                catch (Exception ex)
+                {
+                    SetExportStatus(Enum.TransferStatus.Failed, "Unable to write to export file. ", ex);
+                }
+                SetExportStatus(Enum.TransferStatus.Stopped, "");
+            });
+        }
+        
         public bool IsExportReady()
         {
-            ExportStatus = String.Empty;
-
             if (String.IsNullOrEmpty(ExportPath))
-            {  
-                ExportStatus = "Failed!" + Environment.NewLine + "Export path is missing or invalid";
-                _log.Error("Export did not start as export path is null or empty");
+            {
+                SetExportStatus(Enum.TransferStatus.Failed, "Failed!" + Environment.NewLine + "Export path is missing or invalid");
                 return false;
             }
 
             DBService db = new DBService(ConnectionString.GetString());
             if (!db.IsConnectionValid())
             {
-                ExportStatus = "Failed!" + Environment.NewLine + "Check your database connection.";
-                _log.Error("Export did not start as database connection is invalid");
+                SetExportStatus(Enum.TransferStatus.Failed, "Failed!" + Environment.NewLine + "Check your database connection.");
                 return false;
             }
             return true;
         }
-        private void ClickExportCommand(object obj = null)
-        {
-            _log.Info("***** Export is starting *****");
-            if (!IsExportReady())
-                return;
 
-            IsNotExporting = false;
-            ExportStatus = "Exporting...";
-            DBService db = new DBService(ConnectionString.GetString());
-            List<ItemPriceDTO> items = db.GetAllItemPrices();
-            string path = $"{ExportPath}\\export.csv";
-            Task.Run(() =>
+        public void Visibility(bool isVisible)
+        {
+            if (!isVisible)
+                SetExportStatus(TransferStatus.Reset, "");
+        }
+
+        private void SetExportStatus(TransferStatus status,string ExportMessage, Exception ex = null)
+        {
+            switch (status)
             {
-                try
-                {
-                    Serializer.ToCsv(items, path);
-                    int itemsexported = items.Select(x => x.ItemName).Distinct().Count();
-                    ExportStatus = itemsexported + " items exported" + Environment.NewLine + Environment.NewLine + path;
-                    _log.Info($"Exported {itemsexported} items and {items.Count()} items prices");
-                }
-                catch (Exception ex)
-                {
-                    _log.Error("Unable to write to export file. ", ex);
-                    ExportStatus =
-                        "Unable to write to export file. " + ex.Message;
-                    _log.Error("Export has failed", ex);
-                }
-            });
-            IsNotExporting = true;
-            _log.Info("***** Export is ended *****");
+                case TransferStatus.Started:
+                    IsNotExporting = false;
+                    ExportStatus = ExportMessage;
+                    _log.Info("***** Export Started *****");
+                    break;
+                case TransferStatus.Failed:
+                    IsNotExporting = true;
+                    ExportStatus = ExportMessage;
+                    _log.Error(ExportMessage, ex);
+                    _log.Error("***** Export Failed *****");
+                    break;
+                case TransferStatus.Stopped:
+                    IsNotExporting = true;
+                    _log.Info("***** Export Stopped *****");
+                    break;
+                case TransferStatus.Success:
+                    IsNotExporting = true;
+                    ExportStatus = ExportMessage;
+                    _log.Info(ExportMessage);
+                    _log.Info("***** Export Successful *****");
+                    break;
+                case TransferStatus.Reset:
+                    IsNotExporting = true;
+                    ExportStatus = ExportMessage;
+                    _log.Info(ExportMessage);
+                    _log.Info("***** Export Successful *****");
+                    break;
+            }
         }
     }
 }

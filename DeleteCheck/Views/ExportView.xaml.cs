@@ -20,15 +20,18 @@ namespace FPOSPriceUpdater.Views
     /// </summary>
     public partial class ExportView : Page
     {
+        ExportViewModel ViewModel = new ExportViewModel();
+
         public ExportView()
         {
             InitializeComponent();
-            this.DataContext = new ExportViewModel();
+            this.DataContext = ViewModel;
+            this.IsVisibleChanged += ExportView_IsVisibleChanged;
         }
 
-        private void btnExport_Click(object sender, RoutedEventArgs e)
+        private void ExportView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-
+            ViewModel.Visibility((bool)e.NewValue);
         }
     }
 }
