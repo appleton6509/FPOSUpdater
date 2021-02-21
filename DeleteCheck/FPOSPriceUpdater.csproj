@@ -105,8 +105,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BusinessLogic\Transferable.cs" />
+    <Compile Include="BusinessLogic\Export.cs" />
+    <Compile Include="BusinessLogic\Import.cs" />
+    <Compile Include="BusinessLogic\ITransferable.cs" />
+    <Compile Include="BusinessLogic\ResultMessage.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="Enum\TransferStatus.cs" />
+    <Compile Include="DTO\StatusMessage.cs" />
     <Compile Include="Enum\PageView.cs" />
     <Compile Include="Helper\Navigator.cs" />
     <Compile Include="Helper\RelayCommand.cs" />

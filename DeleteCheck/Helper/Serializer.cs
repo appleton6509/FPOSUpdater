@@ -89,7 +89,8 @@ namespace FPOSPriceUpdater.Helper
                             string newValue = row[i];
                             item.GetType().GetProperty(headers[i]).SetValue(item, newValue, null);
                         } catch(Exception ex) { 
-                            _log.Error("Converting CSV cell to object resulted in an error",ex); 
+                            _log.Error("Converting CSV cell to object resulted in an error",ex);
+                            throw ex;
                         }
                     }
                     items.Add(item);  

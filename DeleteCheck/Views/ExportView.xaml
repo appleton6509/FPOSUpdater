@@ -22,18 +22,17 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Bottom" Text="Export Path:" FontSize="20" Margin="10,0,10,0" />
-        <utils:FolderEntry Text="{Binding Path=ExportPath}"
+        <utils:FolderEntry Text="{Binding Path=Export.Path}"
                            VerticalContentAlignment="Center" FontSize="17"
                            Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" Description="Folder for export file"/>
         <Button x:Name="btnExport" Command="{Binding ClickExport}"
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Content="Export" Grid.Row="2" Grid.ColumnSpan="2"
-                IsEnabled="{Binding IsNotExporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                IsEnabled="{Binding Export.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
         <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
                    TextAlignment="Center" FontSize="17" MinWidth="30"
-                   Text="{Binding ExportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                   Text="{Binding Export.Status, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
-
     </Grid>
 </Page>

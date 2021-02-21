@@ -25,20 +25,20 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Bottom" Text="Import File:" FontSize="20" Margin="10,0,10,0" />
-        <utils:FileEntry Text="{Binding Path=ImportPath}"
+        <utils:FileEntry Text="{Binding Path=Import.Path}"
                            VerticalContentAlignment="Center" FontSize="17"
                            Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" VerticalAlignment="Stretch" Description="Path to import file"/>
         <Button x:Name="btnImport" 
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Command="{Binding ClickImport}" 
                 Content="Import" Grid.Row="2" Grid.ColumnSpan="2" 
-                IsEnabled="{Binding IsNotImporting, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
         <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Border>
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"
                    TextAlignment="Center" MinWidth="30"
                    FontSize="17"
-                   Text="{Binding ImportStatus, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+                   Text="{Binding Import.Status, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
             </Border>
 
         </Grid>
@@ -46,15 +46,15 @@
             <Button x:Name="btnFailedItems" 
                 Style="{DynamicResource btnRoundedStyleRed}" FontSize="14" Command="{Binding ClickViewFailedItems}" 
                 Content="Failed" VerticalAlignment="Top" Margin="5,0,5,0"
-                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                Visibility="{Binding Import.IsDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <Button x:Name="btnImportedItems" 
                 Style="{DynamicResource btnRoundedStyleBlack}" FontSize="14" Command="{Binding ClickViewImportedItems}" 
                 Content="Imported" VerticalAlignment="Top" Margin="5,0,5,0"
-                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                Visibility="{Binding Import.IsDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <Button x:Name="btnIgnoredItems" 
                 Style="{DynamicResource btnRoundedStyleBlack}" FontSize="14" Command="{Binding ClickViewIgnoredItems}" 
                 Content="Ignored" VerticalAlignment="Top" Margin="5,0,5,0"
-                Visibility="{Binding IsImportDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/> 
+                Visibility="{Binding Import.IsDone, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/> 
         </StackPanel>
 
 

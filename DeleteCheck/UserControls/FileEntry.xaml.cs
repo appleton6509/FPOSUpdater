@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 
@@ -38,15 +39,17 @@ namespace FPOSPriceUpdater.UserControls
                 dlg.Filter = "CSV (*.csv)|*.csv";
                 dlg.FilterIndex = 1;
                 dlg.RestoreDirectory = true;
-
-                if (dlg.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    Text = dlg.FileName;
-                    BindingExpression be = GetBindingExpression(TextProperty);
-                    if (be != null)
-                        be.UpdateSource();
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        Text = dlg.FileName;
+                        BindingExpression be = GetBindingExpression(TextProperty);
+                        if (be != null)
+                            be.UpdateSource();
+                    }
+                } catch (Exception) { }
 
-                }
             }
         }
     }

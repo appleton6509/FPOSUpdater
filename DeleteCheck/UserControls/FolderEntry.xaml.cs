@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 
@@ -37,14 +38,17 @@ namespace FPOSPriceUpdater.UserControls
                 dlg.Description = Description;
                 dlg.SelectedPath = Text;
                 dlg.ShowNewFolderButton = true;
-                DialogResult result = dlg.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
+                try
                 {
-                    Text = dlg.SelectedPath;
-                    BindingExpression be = GetBindingExpression(TextProperty);
-                    if (be != null)
-                        be.UpdateSource();
-                }
+                    DialogResult result = dlg.ShowDialog();
+                    if (result == System.Windows.Forms.DialogResult.OK)
+                    {
+                        Text = dlg.SelectedPath;
+                        BindingExpression be = GetBindingExpression(TextProperty);
+                        if (be != null)
+                            be.UpdateSource();
+                    }
+                } catch (Exception) { }
             }
         }
     }
