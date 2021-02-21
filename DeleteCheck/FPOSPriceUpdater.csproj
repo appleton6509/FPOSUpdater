@@ -111,8 +111,7 @@
     <Compile Include="BusinessLogic\ITransferable.cs" />
     <Compile Include="BusinessLogic\ResultMessage.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="DTO\StatusMessage.cs" />
-    <Compile Include="Enum\PageView.cs" />
+    <Compile Include="BusinessLogic\StatusMessage.cs" />
     <Compile Include="Helper\Navigator.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Helper\Serializer.cs" />

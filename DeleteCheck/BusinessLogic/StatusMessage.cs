@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 
 
-namespace FPOSPriceUpdater.DTO
+namespace FPOSPriceUpdater.BusinessLogic
 {
     public enum TransferStatus
     {

@@ -1,10 +1,15 @@
-﻿using FPOSPriceUpdater.Enum;
-using FPOSPriceUpdater.Views;
+﻿using FPOSPriceUpdater.Views;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace FPOSPriceUpdater.Helper
 {
+    public enum PageView
+    {
+        Connection,
+        Import,
+        Export
+    }
     public static class Navigator
     {
         static Page _connection;

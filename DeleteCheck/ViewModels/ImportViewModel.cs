@@ -2,16 +2,10 @@
 using FPOSDB.DTO;
 using FPOSDB.Parameters;
 using FPOSPriceUpdater.BusinessLogic;
-using FPOSPriceUpdater.DTO;
-using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 

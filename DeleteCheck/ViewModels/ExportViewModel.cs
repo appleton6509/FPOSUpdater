@@ -1,8 +1,6 @@
 ﻿using FPOSDB.Context;
 using FPOSDB.DTO;
 using FPOSPriceUpdater.BusinessLogic;
-using FPOSPriceUpdater.DTO;
-using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
@@ -10,10 +8,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace FPOSPriceUpdater.ViewModels

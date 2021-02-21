@@ -1,5 +1,4 @@
 ﻿using FPOSDB.Context;
-using FPOSPriceUpdater.Enum;
 using FPOSPriceUpdater.Helper;
 using log4net;
 using System;
