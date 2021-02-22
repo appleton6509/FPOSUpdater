@@ -12,23 +12,16 @@ namespace FPOSPriceUpdater.Helper
     {
         private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        /// <summary>
-        /// Exports a list of objects to a CSV file
-        /// </summary>
-        /// <typeparam name="T">Type of object</typeparam>
-        /// <param name="data">data to be exported</param>
-        /// <param name="path">full path to csv file</param>
-        public static void ToCsv(List<ItemPriceDTO> data, string path)
+        public static void ExportDataToCsv(List<ItemPriceDTO> data, string path)
+        {
+                WriteHeadersToCsv(path);
+                WriteRowsToCsv(data, path);
+        }
+
+        private static void WriteRowsToCsv(List<ItemPriceDTO> data, string path)
         {
             using (StreamWriter writer = new StreamWriter(path, false))
             {
-                StringBuilder str = new StringBuilder();
-
-                //write the headers
-                string headers = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.Name).ToArray());
-                writer.WriteLine(headers);
-
-                //write the data
                 foreach (ItemPriceDTO item in data)
                 {
                     if (!String.IsNullOrEmpty(item.ItemName) && !String.IsNullOrEmpty(item.ItemID))
@@ -40,13 +33,17 @@ namespace FPOSPriceUpdater.Helper
             }
         }
 
-        /// <summary>
-        /// Exports a list of objects to a CSV file
-        /// </summary>
-        /// <typeparam name="T">Type of object</typeparam>
-        /// <param name="data">data to be exported</param>
-        /// <param name="path">full path to csv file</param>
-        public static void ToFile(List<ItemPriceDTO> data, string fileName)
+        private static void WriteHeadersToCsv(string path)
+        {
+            using (StreamWriter writer = new StreamWriter(path, false))
+            {
+                string headers = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.Name).ToArray());
+                writer.WriteLine(headers);
+            }
+
+        }
+
+        public static void WriteToFile(List<ItemPriceDTO> data, string fileName)
         {
             var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\" + fileName;
             using (StreamWriter writer = new StreamWriter(path, false))

@@ -63,9 +63,9 @@ namespace FPOSPriceUpdater.ViewModels
         }
         private void ImportResultsToFile(ImportResult result)
         {
-            Serializer.ToFile(result.Ignored, IGNORED_ITEMS_FILENAME);
-            Serializer.ToFile(result.Failed, FAILED_ITEMS_FILENAME);
-            Serializer.ToFile(result.Imported, IMPORTED_ITEMS_FILENAME);
+            Serializer.WriteToFile(result.Ignored, IGNORED_ITEMS_FILENAME);
+            Serializer.WriteToFile(result.Failed, FAILED_ITEMS_FILENAME);
+            Serializer.WriteToFile(result.Imported, IMPORTED_ITEMS_FILENAME);
         }
 
         private void ClickImportCommand(object obj = null)
@@ -94,5 +94,6 @@ namespace FPOSPriceUpdater.ViewModels
 
             });
         }
+
     }
 }

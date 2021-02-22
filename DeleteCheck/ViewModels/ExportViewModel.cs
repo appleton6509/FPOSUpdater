@@ -29,34 +29,61 @@ namespace FPOSPriceUpdater.ViewModels
         {
             if (!Export.IsReady())
                 return;
-            Export.UpdateStatus(StatusMessage.Create(TransferStatus.Started, "Exporting..."));
-            
             Task.Run(() =>
             {
                 try
                 {
-                    DBService db = new DBService(ConnectionString.GetString());
-                    List<ItemPriceDTO> items = new List<ItemPriceDTO>();
-                    items = db.GetAllItemPrices();
-                    string path = $"{Export.Path}\\export.csv";
-                    Serializer.ToCsv(items, path);
-                    int itemsexported = items.Select(x => x.ItemName).Distinct().Count();
-                    Export.UpdateStatus(StatusMessage.Create(TransferStatus.Success, $"{itemsexported} items exported {Environment.NewLine} {path}"));
+                    UpdateExportStatusToStarted();
+                    List<ItemPriceDTO> items = GetItemPricesFromDb();
+                    ExportItemsToCsv(items);
+                    UpdateExportStatusToSuccess(items.Select(x => x.ItemName).Distinct().Count());
                 }
                 catch (SqlException ea)
                 {
-                    Export.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, "An error occured with the database.", ea));
+                    UpdateExportStatusToFailed("An error occured with the database.", ea);
                 }
                 catch (IOException ez)
                 {
-                    Export.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, "Unable to write to export file. ", ez));
+                    UpdateExportStatusToFailed("Unable to write to export file. ", ez);
                 }
                 catch (Exception ex)
                 {
-                    Export.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, "Unable to export.", ex));
+                    UpdateExportStatusToFailed("Unable to export.", ex);
                 }
-                Export.UpdateStatus(StatusMessage.Create(TransferStatus.Stopped));
+                UpdateExportStatusToStopped();
+
+
             });
+        }
+
+        public List<ItemPriceDTO> GetItemPricesFromDb()
+        {
+            DBService db = new DBService(ConnectionString.GetString());
+            List<ItemPriceDTO> items = new List<ItemPriceDTO>();
+            items = db.GetAllItemPrices();
+            return items;
+        }
+
+        public void UpdateExportStatusToStarted()
+        {
+            Export.UpdateStatus(StatusMessage.Create(TransferStatus.Started, "Exporting..."));
+        }
+        public void UpdateExportStatusToStopped()
+        {
+            Export.UpdateStatus(StatusMessage.Create(TransferStatus.Stopped));
+        }
+        public void UpdateExportStatusToSuccess(int numberOfItemsExported)
+        {
+            Export.UpdateStatus(StatusMessage.Create(TransferStatus.Success, $"{numberOfItemsExported} items exported {Environment.NewLine} {Export.FullPath}"));
+        }
+        public void UpdateExportStatusToFailed(string errorMessage, Exception e)
+        {
+            Export.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, errorMessage, e));
+        }
+
+        public void ExportItemsToCsv(List<ItemPriceDTO> items)
+        {
+             Serializer.ExportDataToCsv(items, Export.FullPath);
         }
 
         public void Visibility(bool isVisible)
