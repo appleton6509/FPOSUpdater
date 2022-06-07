@@ -2,7 +2,7 @@
 using log4net;
 using System;
 
-namespace FPOSPriceUpdater.BusinessLogic
+namespace FPOSUpdater.BusinessLogic
 {
     public class Export : Transferable, ITransferable
     {

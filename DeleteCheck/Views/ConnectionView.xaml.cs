@@ -1,9 +1,9 @@
-﻿using FPOSPriceUpdater.ViewModels;
+﻿using FPOSUpdater.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
 
-namespace FPOSPriceUpdater.Views
+namespace FPOSUpdater.Views
 {
     /// <summary>
     /// Interaction logic for Connection.xaml

@@ -3,7 +3,7 @@ using log4net;
 using System;
 using System.IO;
 
-namespace FPOSPriceUpdater.BusinessLogic
+namespace FPOSUpdater.BusinessLogic
 {
     public class Import : Transferable, ITransferable
     {

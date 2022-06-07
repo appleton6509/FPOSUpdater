@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPOSPriceUpdater", "DeleteCheck\FPOSPriceUpdater.csproj", "{DA9E8539-124A-43FE-A53F-2F0C07AEE707}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPOSUpdater", "DeleteCheck\FPOSUpdater.csproj", "{DA9E8539-124A-43FE-A53F-2F0C07AEE707}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPOSDB", "FPOSDB\FPOSDB.csproj", "{7B97D10C-3CC7-4275-AF4B-82939459E2E7}"
 EndProject

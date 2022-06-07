@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FPOSPriceUpdater.Properties {
+namespace FPOSUpdater.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

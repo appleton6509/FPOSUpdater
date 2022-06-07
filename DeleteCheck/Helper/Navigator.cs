@@ -1,8 +1,8 @@
-﻿using FPOSPriceUpdater.Views;
+﻿using FPOSUpdater.Views;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace FPOSPriceUpdater.Helper
+namespace FPOSUpdater.Helper
 {
     public enum PageView
     {

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace FPOSPriceUpdater.ViewModels
+namespace FPOSUpdater.ViewModels
 {
     public class ConnectionBaseViewModel : INotifyPropertyChanged
     {

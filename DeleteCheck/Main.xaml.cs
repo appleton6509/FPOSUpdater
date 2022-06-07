@@ -1,5 +1,5 @@
 ﻿using FPOSDB.Context;
-using FPOSPriceUpdater.Helper;
+using FPOSUpdater.Helper;
 using log4net;
 using System;
 using System.ComponentModel;
@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace FPOSPriceUpdater
+namespace FPOSUpdater
 {
     /// <summary>
     /// Interaction logic for Main.xaml

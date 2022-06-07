@@ -5,7 +5,7 @@ using System.Data;
 using log4net;
 using System.Windows;
 
-namespace FPOSPriceUpdater
+namespace FPOSUpdater
 {
     /// <summary>
     /// Interaction logic for App.xaml

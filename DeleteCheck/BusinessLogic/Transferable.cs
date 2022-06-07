@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace FPOSPriceUpdater.BusinessLogic
+namespace FPOSUpdater.BusinessLogic
 {
 
     public class Transferable : INotifyPropertyChanged

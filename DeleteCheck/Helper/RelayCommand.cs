@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace FPOSPriceUpdater.Helper
+namespace FPOSUpdater.Helper
 {
     public class RelayCommand<T> : ICommand
     {

@@ -1,7 +1,7 @@
 ﻿using FPOSDB.Context;
 using FPOSDB.DTO;
-using FPOSPriceUpdater.BusinessLogic;
-using FPOSPriceUpdater.Helper;
+using FPOSUpdater.BusinessLogic;
+using FPOSUpdater.Helper;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace FPOSPriceUpdater.ViewModels
+namespace FPOSUpdater.ViewModels
 {
     public class ExportViewModel : BaseViewModel
     {

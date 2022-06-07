@@ -2,7 +2,7 @@
 using System.ComponentModel;
 
 
-namespace FPOSPriceUpdater.ViewModels
+namespace FPOSUpdater.ViewModels
 {
     public class BaseViewModel : ConnectionBaseViewModel
     {

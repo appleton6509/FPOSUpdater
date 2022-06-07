@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FPOSPriceUpdater.BusinessLogic
+namespace FPOSUpdater.BusinessLogic
 {
     public class ResultMessage<T> where T : BaseModel<T>
     {

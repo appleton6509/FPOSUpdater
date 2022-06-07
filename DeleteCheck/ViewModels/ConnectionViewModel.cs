@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace FPOSPriceUpdater.ViewModels
+namespace FPOSUpdater.ViewModels
 {
     public class ConnectionViewModel : BaseViewModel
     {

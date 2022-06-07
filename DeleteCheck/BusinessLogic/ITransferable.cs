@@ -1,5 +1,5 @@
 ﻿
-namespace FPOSPriceUpdater.BusinessLogic
+namespace FPOSUpdater.BusinessLogic
 {
    public interface ITransferable
     {

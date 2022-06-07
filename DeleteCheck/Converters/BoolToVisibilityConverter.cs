@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
-namespace FPOSPriceUpdater.Converters
+namespace FPOSUpdater.Converters
 {
     public class BoolToVisibilityConverter : IValueConverter
     {

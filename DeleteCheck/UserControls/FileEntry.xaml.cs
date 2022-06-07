@@ -4,7 +4,7 @@ using System.Windows.Data;
 using System.Windows.Forms;
 
 
-namespace FPOSPriceUpdater.UserControls
+namespace FPOSUpdater.UserControls
 {
     /// <summary>
     /// Interaction logic for FileEntry.xaml
