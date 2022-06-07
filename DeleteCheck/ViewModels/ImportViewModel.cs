@@ -15,6 +15,7 @@ namespace FPOSPriceUpdater.ViewModels
     {
         public Import Import { get; set; } = new Import(LogManager.GetLogger(typeof(Import)));
         public ICommand ClickImport { get; set; }
+        public ICommand ClickImportButtons { get; set; }
         public ICommand ClickViewFailedItems { get; set; }
         public ICommand ClickViewIgnoredItems { get; set; }
         public ICommand ClickViewImportedItems { get; set; }
@@ -44,6 +45,7 @@ namespace FPOSPriceUpdater.ViewModels
         public ImportViewModel()
         {
             ClickImport = new RelayCommand<object>(ClickImportCommand);
+            ClickImportButtons = new RelayCommand<object>(ClickImportButtonsCommand);
             ClickViewFailedItems = new RelayCommand<object>(ClickViewFailedItemsCommand);
             ClickViewIgnoredItems = new RelayCommand<object>(ClickViewIgnoredItemsCommand);
             ClickViewImportedItems = new RelayCommand<object>(ClickViewImportedItemsCommand);
@@ -61,7 +63,7 @@ namespace FPOSPriceUpdater.ViewModels
         {
             System.Diagnostics.Process.Start(IGNORED_ITEMS_FILENAME);
         }
-        private void ImportResultsToFile(ImportResult result)
+        private void ImportResultsToFile<T>(IImportResult<T> result) where T : IModel
         {
             Serializer.WriteToFile(result.Ignored, IGNORED_ITEMS_FILENAME);
             Serializer.WriteToFile(result.Failed, FAILED_ITEMS_FILENAME);
@@ -79,9 +81,9 @@ namespace FPOSPriceUpdater.ViewModels
                 try
                 {
                     DBService db = new DBService(ConnectionString.GetString());
-                    List<ItemPriceDTO> items = Serializer.FromCSV(Import.Path);
-                    ImportResult results = db.UpdateItemPrices(items);
-                    ResultMessage message = ResultMessage.Create(items, results);
+                    var items = Serializer.FromCSV<ItemPrice>(Import.Path);
+                    var results = db.UpdateItemPrices(items);
+                    var message = ResultMessage<ItemPrice>.Create(items, results);
                     ImportResultsToFile(results);
                     Import.UpdateStatus(StatusMessage.Create(TransferStatus.Success, message.Generate()));
                 }
@@ -94,6 +96,31 @@ namespace FPOSPriceUpdater.ViewModels
 
             });
         }
+        private void ClickImportButtonsCommand(object obj = null)
+        {
+            if (!Import.IsReady())
+                return;
 
+            Import.UpdateStatus(StatusMessage.Create(TransferStatus.Started, "Importing..."));
+            Task.Run(() =>
+            {
+                try
+                {
+                    DBService db = new DBService(ConnectionString.GetString());
+                    var buttons = Serializer.FromCSV<Button>(Import.Path);
+                    var results = db.UpdateButtonText(buttons);
+                    var message = ResultMessage<Button>.Create(buttons, results);
+                    ImportResultsToFile(results);
+                    Import.UpdateStatus(StatusMessage.Create(TransferStatus.Success, message.Generate()));
+                }
+                catch (Exception ex)
+                {
+                    Import.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, "Unable to read import file.", ex));
+                }
+
+                Import.UpdateStatus(StatusMessage.Create(TransferStatus.Stopped));
+
+            });
+        }
     }
 }

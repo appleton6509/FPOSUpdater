@@ -1,11 +1,15 @@
 ﻿using FPOSDB.DTO;
+using SqlKata;
+using SqlKata.Compilers;
 using System;
 
 
 namespace FPOSDB.Context
 {
-    public static class Query
+    public static class QueryBuilder
     {
+
+        private static readonly Compiler Compiler = new SqlServerCompiler();
 
         /// <summary>
         /// Updates the provided employee id to backoffice password to: Global_11$
@@ -40,11 +44,22 @@ namespace FPOSDB.Context
         }
 
         /// <summary>
+        /// Retrieve all buttons and text
+        /// </summary>
+        /// <returns></returns>
+        public static string SelectAllButtons()
+        {
+            var query = new Query("Button").Select(nameof(Button.ButtonId), nameof(Button.ButtonName), nameof(Button.Text));
+            var result = Compiler.Compile(query);
+            return result.Sql;
+        }
+
+        /// <summary>
         /// updates an items price when the ItemPrice already exists
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static string UpdateExistingItemPrice(ItemPriceDTO newItem, ItemPriceDTO existingItem)
+        public static string UpdateExistingItemPrice(ItemPrice newItem, ItemPrice existingItem)
         {
             if ((newItem.ScheduleIndex != existingItem.ScheduleIndex) ||
                 (newItem.ItemName != existingItem.ItemName))
@@ -66,7 +81,7 @@ namespace FPOSDB.Context
         }
 
 
-        public static string InsertItemPrice(ItemPriceDTO item)
+        public static string InsertItemPrice(ItemPrice item)
         {
             
             var props = item.GetType().GetProperties();
@@ -93,6 +108,15 @@ namespace FPOSDB.Context
             return query;
         }
 
+        public static SqlResult UpdateButtonText(Button button)
+        {
+            var query = new Query("Button")
+                .Where(nameof(Button.ButtonId), button.ButtonId)
+                .AsUpdate(new { Text = button.Text });
+            var result = Compiler.Compile(query);
+            return result;
+        }
+
         /// <summary>
         /// Deletes all item price records associated with an item Name
         /// </summary>
@@ -104,7 +128,7 @@ namespace FPOSDB.Context
                 "where ItemPrice.ItemID = " +
                 "(select DISTINCT Item.ItemID from Item " +
                 "FULL JOIN ItemPrice on Item.ItemId = ItemPrice.ItemID " +
-                $"where Item.ItemName = '{CleanItemName(itemName)}')";
+                $"where Item.ItemName = '{CleanName(itemName)}')";
             return query;
         }
 
@@ -118,16 +142,22 @@ namespace FPOSDB.Context
         {
             return  "select * from ItemPrice " +
                     "FULL JOIN Item on ItemPrice.ItemID = Item.ItemID " +
-                    $"Where Item.ItemName = '{CleanItemName(itemName)}' AND ItemPrice.ScheduleIndex = {scheduleIndex}";
+                    $"Where Item.ItemName = '{CleanName(itemName)}' AND ItemPrice.ScheduleIndex = {scheduleIndex}";
         }
 
         public static string GetItemByName(string itemName)
         {
             return "select ItemID,ItemName from Item " +
-                    $"Where ItemName = '{CleanItemName(itemName)}'";
+                    $"Where ItemName = '{CleanName(itemName)}'";
         }
 
-        public static string CleanItemName(string itemName)
+        public static string GetButtonByName(string name)
+        {
+            return "select ButtonId,ButtonName,Text from Button " +
+                    $"Where ButtonName = '{CleanName(name)}'";
+        }
+
+        public static string CleanName(string itemName)
         {
             string newString = String.Copy(itemName);
             return newString.Replace("\'", "\'\'");

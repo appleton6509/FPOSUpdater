@@ -7,30 +7,30 @@ using System.Text;
 
 namespace FPOSPriceUpdater.BusinessLogic
 {
-    public class ResultMessage 
+    public class ResultMessage<T> where T : BaseModel<T>
     {
-        private readonly List<ItemPriceDTO> csvItems;
-        private readonly ImportResult result;
+        private readonly List<T> csvItems;
+        private readonly IImportResult<T> result;
 
-        private ResultMessage(List<ItemPriceDTO> csvItems, ImportResult results) 
+        private ResultMessage(List<T> csvItems, IImportResult<T> results) 
         {
             this.csvItems = csvItems;
             this.result = results;
         }
-        public static ResultMessage Create(List<ItemPriceDTO> csvItems, ImportResult results)
+        public static ResultMessage<T> Create(List<T> csvItems, IImportResult<T> results)
         {
-            return new ResultMessage(csvItems, results);
+            return new ResultMessage<T>(csvItems, results);
         }
-        public String Generate()
+        public string Generate()
         {
             var ignoredItems = result.DistinctIgnoredCount;
             var importedItems = result.DistinctImportedCount;
             var failedItems = result.DistinctFailedCount;
             var processedItems = failedItems + importedItems + ignoredItems;
-            var csvItemCount = csvItems.Select(x => x.ItemName).Distinct().Count();
+            var csvItemCount = csvItems.Select(x => x.DisplayName).Distinct().Count();
 
             string message = "Import Complete" + Environment.NewLine;
-            message += "Total Items In File:  " + csvItems + Environment.NewLine;
+            message += "Total In File:  " + csvItemCount + Environment.NewLine;
             message += "Total Processed:  " + processedItems + Environment.NewLine;
             message += "Total Ignored:  " + ignoredItems + Environment.NewLine;
             message += "Total Imported:  " + importedItems + Environment.NewLine;

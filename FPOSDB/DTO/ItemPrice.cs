@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FPOSDB.DTO
 {
-    public class ItemPriceDTO 
+    public class ItemPrice : BaseModel<ItemPrice>
     {
         public string ItemName { get; set; }
         public string ItemID { get; set; }
@@ -41,6 +41,9 @@ namespace FPOSDB.DTO
         public string Level28Price { get; set; }
         public string Level29Price { get; set; }
 
+
+        public override string DisplayName => ItemName;
+        public override string PrimaryKey => ItemID;
         public override string ToString()
         {
             return "Item Name: " + this.ItemName;
@@ -59,26 +62,6 @@ namespace FPOSDB.DTO
                 }
             }
             return isPriceZero;
-        }
-
-
-        public bool AreEqual(ItemPriceDTO item)
-        {
-            bool areEqual = true;
-            var props = this.GetType().GetProperties();
-   
-            foreach (var prop in props)
-            {
-                var thisPropValue = (int)prop.GetValue(this, null);
-                var otherPropValue = (int)prop.GetValue(item, null);
-                if (thisPropValue != otherPropValue)
-                {
-                    areEqual = false;
-                    break;
-                }
-            }
-
-            return areEqual;
         }
     }
 }

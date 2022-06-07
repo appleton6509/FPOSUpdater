@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FPOSPriceUpdater"
         mc:Ignorable="d"
-        Title="FPOS Price Updator" MinHeight="470" Height="470" Width="650"  MinWidth="465" WindowStartupLocation="CenterScreen">
+        Title="FPOS Updator" MinHeight="470" Height="470" Width="650"  MinWidth="465" WindowStartupLocation="CenterScreen">
     <Grid x:Name="Grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
@@ -22,10 +22,10 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Button x:Name="btnExportPrices" Grid.Row="0" Style="{DynamicResource btnBoxStyle}" Click="btnExportPrices_Click">
-                <TextBlock Text="Export Prices" TextWrapping="WrapWithOverflow"/>
+                <TextBlock Text="Export" TextWrapping="WrapWithOverflow"/>
             </Button>
             <Button x:Name="btnImportPrices" Grid.Row="1" Style="{DynamicResource btnBoxStyle}" Click="btnImportPrices_Click" >
-                <TextBlock Text="Import Prices" TextWrapping="WrapWithOverflow"/>
+                <TextBlock Text="Import" TextWrapping="WrapWithOverflow"/>
             </Button>
             <Button x:Name="btnSettings" Grid.Row="2" Style="{DynamicResource btnBoxStyle}" Click="btnSettings_Click">
                 <TextBlock Text="Settings" TextWrapping="WrapWithOverflow"/>

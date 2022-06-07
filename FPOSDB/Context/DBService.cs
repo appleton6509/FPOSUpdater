@@ -4,15 +4,17 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using SqlKata;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using FPOSDB.Attributes;
+using FPOSDB.Extensions;
 
 namespace FPOSDB.Context
 {
     public class DBService
     {
         private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         string connectionString { get; set; }
 
         public DBService(string connectionString)
@@ -45,36 +47,63 @@ namespace FPOSDB.Context
         /// Get All item prices from the DB
         /// </summary>
         /// <returns></returns>
-        public List<ItemPriceDTO> GetAllItemPrices()
+        public List<ItemPrice> GetAllItemPrices()
         {
-            SqlCommand command = null;
-            SqlDataReader dataReader = null;
-            SqlConnection connection = new SqlConnection(connectionString);
-            List<ItemPriceDTO> items = new List<ItemPriceDTO>();
             try
             {
-                connection.Open();
-
-                string sql = Query.SelectAllItemPrices();
-                command = new SqlCommand(sql, connection);
-                dataReader = command.ExecuteReader();
-                ItemPriceDTO item;
-                while (dataReader.Read())
-                {
-                    item = new ItemPriceDTO();
-                    foreach(var prop in item.GetType().GetProperties())
-                    {
-                        string newValue = dataReader[prop.Name].ToString().ToUpper();
-                            prop.SetValue(item, newValue, null);
-                    }
-
-                    items.Add(item);
-                }
-            
+                return GetAll<ItemPrice>(QueryBuilder.SelectAllItemPrices());
             }
             catch (Exception ex)
             {
                 _log.Error("Retrieving all item prices from db to list failed", ex);
+                return new List<ItemPrice>();
+            }
+        }
+
+        /// <summary>
+        /// Get All buttons from db
+        /// </summary>
+        /// <returns></returns>
+        public List<Button> GetAllButtons()
+        {
+            try
+            {
+                return GetAll<Button>(QueryBuilder.SelectAllButtons());
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Retrieving all buttons from db to list failed", ex);
+                return new List<Button>();
+            }
+        }
+
+        public List<T> GetAll<T>(string query) where T : new()
+        {
+            SqlCommand command = null;
+            SqlDataReader dataReader = null;
+            SqlConnection connection = new SqlConnection(connectionString);
+            var dbObjects = new List<T>();
+            try
+            {
+                connection.Open();
+                command = new SqlCommand(query, connection);
+                dataReader = command.ExecuteReader();
+                var dbObject = new T();
+                var properties = dbObject.GetType().GetProperties();
+                while (dataReader.Read())
+                {
+                    dbObject = new T();
+                    foreach (var prop in properties)
+                    {
+                        var serializable = !Attribute.IsDefined(prop, typeof(NotSerializable));
+                        if (serializable)
+                        {
+                            var newValue = dataReader[prop.Name].ToString();
+                            prop.SetValue(dbObject, newValue, null);
+                        }
+                    }
+                    dbObjects.Add(dbObject);
+                }
             }
             finally
             {
@@ -84,19 +113,17 @@ namespace FPOSDB.Context
                     command.Dispose();
                 connection.Close();
             }
-
-            return items;
+            return dbObjects;
         }
 
-
-        public ImportResult UpdateItemPrices(List<ItemPriceDTO> itemsToUpdate)
+        public IImportResult<ItemPrice> UpdateItemPrices(List<ItemPrice> itemsToUpdate)
         {
-            List<ItemPriceDTO> newItems = new List<ItemPriceDTO>(itemsToUpdate);
-            List<ItemPriceDTO> matchinItems = new List<ItemPriceDTO>();
-            ImportResult result = new ImportResult();
+            List<ItemPrice> newItems = new List<ItemPrice>(itemsToUpdate);
+            List<ItemPrice> matchinItems = new List<ItemPrice>();
+            var result = new ImportResult<ItemPrice>();
 
 
-            foreach (ItemPriceDTO item in newItems)
+            foreach (ItemPrice item in newItems)
             {
                 item.ItemID = GetItemIdByItemName(item.ItemName);
 
@@ -109,7 +136,7 @@ namespace FPOSDB.Context
                 }
             }
 
-            foreach (ItemPriceDTO item in matchinItems)
+            foreach (ItemPrice item in matchinItems)
             {
                 if (item.IsZeroPrice())
                     result.Imported.Add(item);
@@ -126,15 +153,44 @@ namespace FPOSDB.Context
             return result;
         }
 
-        private string GetItemIdByItemName(string itemName)
+        public IImportResult<Button> UpdateButtonText(List<Button> buttons)
         {
-            SqlConnection connection = null;
+            var newButtons = new List<Button>(buttons);
+            var matchinItems = new List<Button>();
+            var result = new ImportResult<Button>();
+
+            foreach (Button newButton in newButtons)
+            {
+                var oldButton = GetButtonByButtonName(newButton.ButtonName);
+                newButton.ButtonId = oldButton.ButtonId;
+
+                //old button id wasnt found or button text is unchanged
+                if (String.IsNullOrEmpty(oldButton.ButtonId) || 
+                    oldButton?.Text.Equals(newButton.Text.ReplaceEscapedCharactors(), StringComparison.OrdinalIgnoreCase) != false)
+                    result.Ignored.Add(newButton);
+                else
+                    matchinItems.Add(newButton);
+            }
+
+            foreach (Button button in matchinItems)
+            {
+                var rowUpdated = UpdateButtonText(button);
+                if (rowUpdated > 0)
+                    result.Imported.Add(button);
+                else
+                    result.Failed.Add(button);
+            }
+
+            return result;
+        }
+
+        private string GetItemIdByItemName(string name)
+        {
             SqlCommand command = null;
             SqlDataReader dataReader = null;
-
-            string sql = Query.GetItemByName(itemName);
-            connection = new SqlConnection(connectionString);
-            ItemDTO item = new ItemDTO();
+            var sql = QueryBuilder.GetItemByName(name);
+            var connection = new SqlConnection(connectionString);
+            var item = new Item();
             try
             {
                 connection.Open();
@@ -162,27 +218,42 @@ namespace FPOSDB.Context
             return item.ItemId;
         }
 
-        public int UpdateItemPrice(ItemPriceDTO newItem, ItemPriceDTO existingItem)
+        private Button GetButtonByButtonName(string buttonText)
         {
-            SqlConnection connection = new SqlConnection(connectionString);
-            int rowsUpdated = 0;
+            SqlCommand command = null;
+            SqlDataReader dataReader = null;
+            var sql = QueryBuilder.GetButtonByName(buttonText);
+            var connection = new SqlConnection(connectionString);
+            var button = new Button();
             try
             {
                 connection.Open();
-                string query = Query.UpdateExistingItemPrice(newItem, existingItem);
-                using (SqlCommand cmd = new SqlCommand(query, connection))
+                command = new SqlCommand(sql, connection);
+                dataReader = command.ExecuteReader();
+
+                while (dataReader.Read())
                 {
-                    rowsUpdated = cmd.ExecuteNonQuery();
+                    button.ButtonId = dataReader[nameof(button.ButtonId)].ToString();
+                    button.Text = dataReader[nameof(button.Text)].ToString();
                 }
             }
-            catch (Exception ex) {
-                _log.Error("Updating an item price in the DB failed", ex);
+            catch (Exception ex)
+            {
+                _log.Error("Retrieve an item price BY NAME in the DB failed", ex);
             }
-            finally { connection.Close(); }
-
-            return rowsUpdated;
+            finally
+            {
+                if (dataReader != null)
+                    dataReader.Close();
+                if (command != null)
+                    command.Dispose();
+                connection.Close();
+            }
+            return button;
         }
-        public int InsertItemPrice(ItemPriceDTO item)
+
+
+        public int InsertItemPrice(ItemPrice item)
         {
             if (String.IsNullOrEmpty(item.ItemID))
                 throw new ArgumentNullException("ItemID for item \"" + item.ItemName + "\" is missing while inserting new item price");
@@ -192,7 +263,7 @@ namespace FPOSDB.Context
             try
             {
                 connection.Open();
-                string query = Query.InsertItemPrice(item);
+                string query = QueryBuilder.InsertItemPrice(item);
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     rowsUpdated = cmd.ExecuteNonQuery();
@@ -200,6 +271,35 @@ namespace FPOSDB.Context
             }
             catch (Exception ex) {
                 _log.Error("Inserting an item price into the DB failed", ex);
+            }
+            finally { connection.Close(); }
+
+            return rowsUpdated;
+        }
+
+        public int UpdateButtonText(Button button)
+        {
+            if (String.IsNullOrEmpty(button.ButtonId))
+                throw new ArgumentNullException("ButtonId for button \"" + button.ButtonId + "\" is missing while updated new button text");
+
+            SqlConnection connection = new SqlConnection(connectionString);
+            int rowsUpdated = 0;
+            try
+            {
+                connection.Open();
+                var sqlResult = QueryBuilder.UpdateButtonText(button);
+                using (SqlCommand cmd = new SqlCommand(sqlResult.Sql,connection))
+                {
+                    foreach(var sql in sqlResult.NamedBindings)
+                    {
+                        cmd.Parameters.Add(new SqlParameter() { ParameterName = sql.Key, Value = sql.Value.ToString().ReplaceEscapedCharactors() });
+                    }
+                    rowsUpdated = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Updating button text in DB failed", ex);
             }
             finally { connection.Close(); }
 
@@ -218,7 +318,7 @@ namespace FPOSDB.Context
             try
             {
                 connection.Open();
-                string query = Query.DeleteItemPricesByItemName(itemName);
+                string query = QueryBuilder.DeleteItemPricesByItemName(itemName);
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     rowsDeleted = cmd.ExecuteNonQuery();

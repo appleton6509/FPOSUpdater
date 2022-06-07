@@ -16,13 +16,15 @@ namespace FPOSPriceUpdater.ViewModels
     public class ExportViewModel : BaseViewModel
     {
         public Export Export { get; set; } = new Export(LogManager.GetLogger(typeof(Export)));
-    
+
         public ICommand ClickExport { get; set; }
 
+        public ICommand ClickExportButtons { get; set; }
         public ExportViewModel()
         {
             Export.FullPath = $"{Export.Path}\\export.csv";
             ClickExport = new RelayCommand<object>(ClickExportCommand);
+            ClickExportButtons = new RelayCommand<object>(ClickExportButtonsCommand);
         }
 
         private void ClickExportCommand(object obj = null)
@@ -33,8 +35,9 @@ namespace FPOSPriceUpdater.ViewModels
             {
                 try
                 {
+                    Export.FullPath = $"{Export.Path}\\exportItems.csv";
                     UpdateExportStatusToStarted();
-                    List<ItemPriceDTO> items = GetItemPricesFromDb();
+                    List<ItemPrice> items = GetItemPricesFromDb();
                     ExportItemsToCsv(items);
                     UpdateExportStatusToSuccess(items.Select(x => x.ItemName).Distinct().Count());
                 }
@@ -56,12 +59,50 @@ namespace FPOSPriceUpdater.ViewModels
             });
         }
 
-        public List<ItemPriceDTO> GetItemPricesFromDb()
+        private void ClickExportButtonsCommand(object obj = null)
+        {
+            if (!Export.IsReady())
+                return;
+            Task.Run(() =>
+            {
+                try
+                {
+                    Export.FullPath = $"{Export.Path}\\exportButtons.csv";
+                    UpdateExportStatusToStarted();
+                    var buttons = GetButtonsTextFromDb();
+                    ExportButtonsToCsv(buttons);
+                    UpdateExportStatusToSuccess(buttons.Select(x => x.DisplayName).Distinct().Count());
+                }
+                catch (SqlException ea)
+                {
+                    UpdateExportStatusToFailed("An error occured with the database.", ea);
+                }
+                catch (IOException ez)
+                {
+                    UpdateExportStatusToFailed("Unable to write to export file. ", ez);
+                }
+                catch (Exception ex)
+                {
+                    UpdateExportStatusToFailed("Unable to export.", ex);
+                }
+                UpdateExportStatusToStopped();
+
+
+            });
+        }
+
+        public List<ItemPrice> GetItemPricesFromDb()
         {
             DBService db = new DBService(ConnectionString.GetString());
-            List<ItemPriceDTO> items = new List<ItemPriceDTO>();
-            items = db.GetAllItemPrices();
+            var items = db.GetAllItemPrices();
             return items;
+        }
+
+        public List<Button> GetButtonsTextFromDb()
+        {
+            DBService db = new DBService(ConnectionString.GetString());
+            var buttons = db.GetAllButtons();
+            return buttons;
         }
 
         public void UpdateExportStatusToStarted()
@@ -81,9 +122,14 @@ namespace FPOSPriceUpdater.ViewModels
             Export.UpdateStatus(StatusMessage.Create(TransferStatus.Failed, errorMessage, e));
         }
 
-        public void ExportItemsToCsv(List<ItemPriceDTO> items)
+        public void ExportItemsToCsv(List<ItemPrice> items)
         {
              Serializer.ExportDataToCsv(items, Export.FullPath);
+        }
+
+        public void ExportButtonsToCsv(List<Button> buttons)
+        {
+            Serializer.ExportDataToCsv(buttons, Export.FullPath);
         }
 
         public void Visibility(bool isVisible)

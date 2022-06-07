@@ -1,4 +1,6 @@
-﻿using FPOSDB.DTO;
+﻿using FPOSDB.Attributes;
+using FPOSDB.DTO;
+using FPOSDB.Extensions;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -12,38 +14,48 @@ namespace FPOSPriceUpdater.Helper
     {
         private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void ExportDataToCsv(List<ItemPriceDTO> data, string path)
+        public static void ExportDataToCsv<T>(List<T> data, string path) where T : IModel
         {
-                WriteHeadersToCsv(path);
+                WriteHeadersToCsv<T>(path);
                 WriteRowsToCsv(data, path);
         }
 
-        private static void WriteRowsToCsv(List<ItemPriceDTO> data, string path)
+        private static void WriteRowsToCsv<T>(List<T> data, string path) where T : IModel
         {
-            using (StreamWriter writer = new StreamWriter(path, false))
+            using (StreamWriter writer = new StreamWriter(path, true))
             {
-                foreach (ItemPriceDTO item in data)
+                var properties = typeof(T).GetProperties();
+                foreach (T item in data)
                 {
-                    if (!String.IsNullOrEmpty(item.ItemName) && !String.IsNullOrEmpty(item.ItemID))
+                    if (!String.IsNullOrEmpty(item.DisplayName) && !String.IsNullOrEmpty(item.PrimaryKey))
                     {
-                        var row = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.GetValue(item, null).ToString()).ToArray());
+                        var row = string.Join(";",
+                            properties
+                            .Where(x => !Attribute.IsDefined(x, typeof(NotSerializable)))
+                            .Select(x => x.GetValue(item, null).ToString().ToLiteral())
+                            .ToArray()
+                            );
                         writer.WriteLine(row);
                     }
                 }
             }
         }
 
-        private static void WriteHeadersToCsv(string path)
+        private static void WriteHeadersToCsv<T>(string path) where T : IModel
         {
             using (StreamWriter writer = new StreamWriter(path, false))
             {
-                string headers = string.Join(";", typeof(ItemPriceDTO).GetProperties().Select(x => x.Name).ToArray());
+                var properties = typeof(T).GetProperties();
+                string headers = string.Join(";", properties
+                    .Where(x => !Attribute.IsDefined(x, typeof(NotSerializable)))
+                    .Select(x => x.Name)
+                    .ToArray()
+                    );
                 writer.WriteLine(headers);
             }
-
         }
 
-        public static void WriteToFile(List<ItemPriceDTO> data, string fileName)
+        public static void WriteToFile<T>(List<T> data, string fileName) where T : IModel
         {
             var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\" + fileName;
             using (StreamWriter writer = new StreamWriter(path, false))
@@ -53,10 +65,10 @@ namespace FPOSPriceUpdater.Helper
                 writer.WriteLine(DateTime.Now);
                 foreach(var item in data)
                 {
-                    if (!itemsDone.Contains(item.ItemName))
+                    if (!itemsDone.Contains(item.DisplayName))
                     {
                         writer.WriteLine(item);
-                        itemsDone.Add(item.ItemName);
+                        itemsDone.Add(item.DisplayName);
                     }
                 }
             }
@@ -67,33 +79,33 @@ namespace FPOSPriceUpdater.Helper
         /// </summary>
         /// <param name="path">the full path to the csv file</param>
         /// <returns></returns>
-        public static List<ItemPriceDTO> FromCSV(string path)
+        public static List<T> FromCSV<T>(string path) where T : new()
         {
-            List<ItemPriceDTO> items = new List<ItemPriceDTO>();
+            var models = new List<T>();
             using(StreamReader reader = new StreamReader(path))
             {
-                ItemPriceDTO item;
+                T model;
                 string[] headers = reader.ReadLine().Split(';');
 
                 string line;
                 while ((line = reader.ReadLine()) != null) {
                     string[] row = line.Split(';');
-                    item = new ItemPriceDTO();
+                    model = new T();
                     for (int i = 0; i < headers.Length; i++)
                     {
                         try
                         {
                             string newValue = row[i];
-                            item.GetType().GetProperty(headers[i]).SetValue(item, newValue, null);
+                            model.GetType().GetProperty(headers[i]).SetValue(model, newValue, null);
                         } catch(Exception ex) { 
                             _log.Error("Converting CSV cell to object resulted in an error",ex);
                             throw ex;
                         }
                     }
-                    items.Add(item);  
+                    models.Add(model);  
                 }
             }
-            return items;
+            return models;
         }
     }
 }

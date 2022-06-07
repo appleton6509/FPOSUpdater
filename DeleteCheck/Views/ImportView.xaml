@@ -28,12 +28,22 @@
         <utils:FileEntry Text="{Binding Path=Import.Path}"
                            VerticalContentAlignment="Center" FontSize="17"
                            Grid.Row="1" Grid.ColumnSpan="2" Margin="10,0,10,0" VerticalAlignment="Stretch" Description="Path to import file"/>
-        <Button x:Name="btnImport" 
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Width="Auto" Grid.Row="2" Grid.ColumnSpan="2" >
+            <Button x:Name="btnImport" 
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Command="{Binding ClickImport}" 
-                Content="Import" Grid.Row="2" Grid.ColumnSpan="2" 
-                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-        <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                Content="Import Items"  
+                Margin="5,5,5,5"
+                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+            <Button x:Name="btnImportButton" 
+                Style="{DynamicResource btnRoundedStyleBlack}"
+                Command="{Binding ClickImportButtons}" 
+                Content="Import Btn Text"
+                Margin="5,5,5,5"
+                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  />
+
+        </StackPanel>
+      <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Border>
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"
                    TextAlignment="Center" MinWidth="30"
