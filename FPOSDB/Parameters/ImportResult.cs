@@ -14,6 +14,7 @@ namespace FPOSDB.Parameters
         List<T> Failed { get; set; }
         List<T> Ignored { get; set; }
         List<T> Imported { get; set; }
+        string ImportConditions { get; }
     }
 
     public class ImportResult<T> : IImportResult<T> where T : IModel
@@ -24,6 +25,19 @@ namespace FPOSDB.Parameters
         public List<T> Imported { get; set; } = new List<T>();
         public List<T> Failed { get; set; } = new List<T>();
         public List<T> Ignored { get; set; } = new List<T>();
+        public string ImportConditions { 
+            get
+            {
+                if (typeof(T) == typeof(Button))
+                {
+                    return $"Button Name matches & Text has changed.";
+                } else if (typeof(T) == typeof(ItemPrice))
+                {
+                    return $"Item Name matches.";
+                }
+                return "";
+            } 
+        }
 
     }
 }

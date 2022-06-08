@@ -14,6 +14,7 @@ namespace FPOSUpdater.ViewModels
     public class ImportViewModel : BaseViewModel
     {
         public Import Import { get; set; } = new Import(LogManager.GetLogger(typeof(Import)));
+        public string ImportConditions { get; set; }
         public ICommand ClickImport { get; set; }
         public ICommand ClickImportButtons { get; set; }
         public ICommand ClickViewFailedItems { get; set; }

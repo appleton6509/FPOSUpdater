@@ -29,13 +29,12 @@ namespace FPOSUpdater.BusinessLogic
             var processedItems = failedItems + importedItems + ignoredItems;
             var csvItemCount = csvItems.Select(x => x.DisplayName).Distinct().Count();
 
-            string message = "Import Complete" + Environment.NewLine;
+            string message = "Import Condition(s):  " + result.ImportConditions + Environment.NewLine + Environment.NewLine;
             message += "Total In File:  " + csvItemCount + Environment.NewLine;
             message += "Total Processed:  " + processedItems + Environment.NewLine;
             message += "Total Ignored:  " + ignoredItems + Environment.NewLine;
             message += "Total Imported:  " + importedItems + Environment.NewLine;
             message += "Total Failed:  " + failedItems + Environment.NewLine;
-
             return message;
         }
     }
