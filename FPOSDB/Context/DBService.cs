@@ -260,10 +260,11 @@ namespace FPOSDB.Context
 
             SqlConnection connection = new SqlConnection(connectionString);
             int rowsUpdated = 0;
+            string query;
             try
             {
                 connection.Open();
-                string query = QueryBuilder.InsertItemPrice(item);
+                query = QueryBuilder.InsertItemPrice(item);
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     rowsUpdated = cmd.ExecuteNonQuery();

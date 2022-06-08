@@ -41,7 +41,6 @@ namespace FPOSDB.DTO
         public string Level28Price { get; set; }
         public string Level29Price { get; set; }
 
-
         public override string DisplayName => ItemName;
         public override string PrimaryKey => ItemID;
         public override string ToString()

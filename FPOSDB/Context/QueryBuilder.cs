@@ -1,4 +1,5 @@
-﻿using FPOSDB.DTO;
+﻿using FPOSDB.Attributes;
+using FPOSDB.DTO;
 using SqlKata;
 using SqlKata.Compilers;
 using System;
@@ -69,7 +70,9 @@ namespace FPOSDB.Context
             string query = "UPDATE ItemPrice SET ";
             foreach (var prop in props)
             {
-                if (prop.Name != nameof(newItem.ItemName) && prop.Name != nameof(newItem.ItemID))
+                if (prop.Name != nameof(newItem.ItemName) && 
+                    prop.Name != nameof(newItem.ItemID) &&
+                    !Attribute.IsDefined(prop, typeof(NotSerializable)))
                     query += $"{prop.Name} = {prop.GetValue(newItem, null)}, ";
             }
             query = query.Substring(0, query.Length - 2) + " "; //remove comma at end of query
@@ -83,20 +86,22 @@ namespace FPOSDB.Context
 
         public static string InsertItemPrice(ItemPrice item)
         {
-            
+
             var props = item.GetType().GetProperties();
             string query = "Insert INTO ItemPrice (";
             //query column headers
             foreach (var prop in props)
-            {   
-                  if (prop.Name != nameof(item.ItemName))
-                        query += $"{prop.Name}, ";
+            {
+                if (prop.Name != nameof(item.ItemName) && !Attribute.IsDefined(prop, typeof(NotSerializable)))
+                    query += $"{prop.Name}, ";
             }
             query = query.Substring(0, query.Length - 2); //remove comma at end of query
             query += ") VALUES (";
             //query values
             foreach (var prop in props)
             {
+                if (Attribute.IsDefined(prop, typeof(NotSerializable)))
+                    continue;
                 if (prop.Name == nameof(item.ItemID))
                     query += $"'{prop.GetValue(item, null)}', ";
                 else if (prop.Name != nameof(item.ItemName))
