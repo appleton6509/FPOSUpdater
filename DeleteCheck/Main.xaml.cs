@@ -27,7 +27,7 @@ namespace FPOSUpdater
 
         private void CreateConnectionString()
         {
-            var Instance = "LOCALHOST/CESSQL";
+            var Instance = "LOCALHOST\\CESSQL";
             var DBName = "FPOS5";
             ConnectionString.CreateString(Instance, DBName);
         }

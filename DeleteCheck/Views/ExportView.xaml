@@ -31,11 +31,11 @@
                 Content="Export Items" 
                 Margin="5,5,5,5"
                 IsEnabled="{Binding Export.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-            <Button x:Name="btnExportButton" Command="{Binding ClickExportButtons}"
+            <!--<Button x:Name="btnExportButton" Command="{Binding ClickExportButtons}"
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Content="Export Btn Text"
                 Margin="5,5,5,5"
-                IsEnabled="{Binding Export.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                IsEnabled="{Binding Export.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />-->
         </StackPanel>
         <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"

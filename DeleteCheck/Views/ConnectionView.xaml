@@ -24,7 +24,7 @@
         <TextBox Grid.Row="1" x:Name="Instance" FontSize="16"
                  Text="{Binding Instance, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ToolTip="i.e. LOCALHOST\CESSQL" 
                  Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="20,0,20,0"  />
-        <Label Grid.Row="0" Content="Server/Instance" FontSize="20" Padding="0,0,0,0"
+        <Label Grid.Row="0" Content="Server\Instance" FontSize="20" Padding="0,0,0,0"
                Grid.ColumnSpan="2" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"/>
         <Label Content="Database" Padding="0,0,0,0" FontSize="20" Grid.Row="2"
                Grid.ColumnSpan="2" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"/>

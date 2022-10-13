@@ -67,18 +67,18 @@ namespace FPOSUpdater.ViewModels
         {
             IsTestRunning = true;
             DBService db = new DBService(ConnectionString.GetString());
-            Task.Run(() =>
-            {
-                ConnectionStatus = "Trying to connect...";
-                bool isValid = db.IsConnectionValid();
-                IsConnected = isValid;
-                IsTestRunning = false;
-                if (isValid)
-                    ConnectionStatus = "Connected!";
-                else
-                    ConnectionStatus = "Not Connected";
+            _ = Task.Run(() =>
+              {
+                  ConnectionStatus = "Trying to connect...";
+                  bool isValid = db.IsConnectionValid();
+                  IsConnected = isValid;
+                  IsTestRunning = false;
+                  if (isValid)
+                      ConnectionStatus = "Connected!";
+                  else
+                      ConnectionStatus = "Not Connected";
 
-            });
+              });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

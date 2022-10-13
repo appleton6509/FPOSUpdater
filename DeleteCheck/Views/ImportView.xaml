@@ -35,12 +35,12 @@
                 Content="Import Items"  
                 Margin="5,5,5,5"
                 IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
-            <Button x:Name="btnImportButton" 
+            <!--<Button x:Name="btnImportButton" 
                 Style="{DynamicResource btnRoundedStyleBlack}"
                 Command="{Binding ClickImportButtons}" 
                 Content="Import Btn Text"
                 Margin="5,5,5,5"
-                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  />
+                IsEnabled="{Binding Import.IsNotRunning, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  />-->
 
         </StackPanel>
       <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

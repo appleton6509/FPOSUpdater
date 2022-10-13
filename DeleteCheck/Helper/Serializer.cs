@@ -16,8 +16,8 @@ namespace FPOSUpdater.Helper
 
         public static void ExportDataToCsv<T>(List<T> data, string path) where T : IModel
         {
-                WriteHeadersToCsv<T>(path);
-                WriteRowsToCsv(data, path);
+            WriteHeadersToCsv<T>(path);
+            WriteRowsToCsv(data, path);
         }
 
         private static void WriteRowsToCsv<T>(List<T> data, string path) where T : IModel
